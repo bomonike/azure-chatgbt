@@ -15,19 +15,21 @@ Here are the steps to make this happen:
 
 1. <a href="#Install-Prerequisite-Utilities">Install Perequisite Utilities</a>
 1. <a href="#Download">Download from GitHub</a>
+1. <a href="#Configure-Custom-Values">Configure Custom Values</a>
 
-1. <a href="#Azure-Terraform-Providers">Azure Terraform Providers</a>
 1. <a href="#GitHub-Workflow-actions">GitHub Workflow Actions</a>
-1. <a href="#Build-Running-Containers">Build Running Containers</a>
-1. <a href="#Build-Kubernetes">Build Kubernetes</a>
+1. <a href="#Build-Custom-Docker-Containers-into-ACR">Build Custom Docker Containers into ACR</a>
 
-1. <a href="#Infrastructure-Architecture-Diagram"> Infrastructure Architecture Diagram</a>
-   <a href="#Private-Endpoints">Private Endpoints</a>
-   <a href="#Private-Endpoints">Private Endpoints</a>
-   <a href="#Private-Endpoints">Private Endpoints</a>
-   <a href="#Private-Endpoints">Private Endpoints</a>
+1. <a href="#Fabric-Data+to-Vector-database">Fabric Data to Vector database</a>
+1. <a href="#Kubernetes-Components">Kubernetes Components</a>
 
-1. <a href="#Configure">Configure custom values</a>
+1. <a href="#Terraform-Providers">Terraform Providers</a>
+1. <a href="#Terraform-Modules">Terraform Modules</a>
+
+1. <a href="#Infrastructure-Architecture-Diagram">Infrastructure Architecture Diagram</a>
+   1. <a href="#Private-Endpoints">Private Endpoints</a>
+   <br /><br />
+
 1. <a href="#Run+Deployment+Scripts">Run Deployment Scripts</a>
 
 1. <a href="#Review-deployed-resources">Review deployed resources</a>
@@ -50,7 +52,7 @@ End-users interact with a <strong>Chat application</strong> (on the "front-end")
 
 A traditional Chat app, such as the iMessage app on iPhones between people, has a human on both ends of the conversation.
 
-Two applications are constructed by this repo.
+Two applications are constructed by this repo:
 
 ![Containers](images/containers.png)
  
@@ -58,11 +60,13 @@ A. The "front-end" <strong>Chat app</strong> is used by humans to interact with 
 
 B. The <strong>Docs app</strong> ???
 
-Both apps are written in Python and run within a Docker Container orchestrated as a pod within the <a href="Kubernetes">Kubernetes container orchestrator</a>.
+### Python
 
-Both make API calls to two AI (Artificial Intelligence) services pretending to be human:
+Both apps are written in Python and run within a <strong>Docker Container</strong> orchestrated as a pod within the <a href="Kubernetes">Kubernetes container orchestrator</a>.
 
-### OpenAI LLM Service
+Both apps make API calls to two AI (Artificial Intelligence) services pretending to be human:
+
+### OpenAI Service
 
 1. The [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) uses the "ChatGPT-3.5" version of OpenAI's LLM (Large Language Model) that became famous in 2023 for its ability to <strong>generate</strong> new content based on existing content. LLMs also enable [content summarization](https://www.zdnet.com/article/how-to-use-chatgpt-to-summarize-a-book-article-or-research-paper/), semantic search, and natural language to code translation. Users can access the service through REST APIs, Python SDK, or  the web-based interface in the Azure OpenAI Studio.
 
@@ -111,7 +115,7 @@ Both make API calls to two AI (Artificial Intelligence) services pretending to b
 
    ### LangChain
 
-   LangChain is a language model integration framework designed to streamline the development of applications using [large language models (LLMs)](https://en.wikipedia.org/wiki/Large_language_model). 
+1. LangChain is a language model integration framework designed to streamline the development of applications using [large language models (LLMs)](https://en.wikipedia.org/wiki/Large_language_model). 
    
    LangChain facilitates applications such as document analysis and summarization, chatbots, and code analysis.
 
@@ -119,7 +123,7 @@ Both make API calls to two AI (Artificial Intelligence) services pretending to b
 
    ### ChromaDB
 
-   A [vector database](https://learn.microsoft.com/en-us/semantic-kernel/memories/vector-db) is a specialized database that goes beyond traditional storage by organizing information to simplify the search for similar items. Instead of merely storing words or numbers, it leverages vector embeddings - unique numerical representations of data. These embeddings capture meaning, context, and relationships. For instance, words are represented as vectors, whereas similar words have similar vector values.
+1. A [vector database](https://learn.microsoft.com/en-us/semantic-kernel/memories/vector-db) is a specialized database that goes beyond traditional storage by organizing information to simplify the search for similar items. Instead of merely storing words or numbers, it leverages vector embeddings - unique numerical representations of data. These embeddings capture meaning, context, and relationships. For instance, words are represented as vectors, whereas similar words have similar vector values.
 
    The applications of vector databases are numerous and powerful. In language processing, they facilitate the discovery of related documents or sentences. By comparing the vector embeddings of different texts, finding similar or related information becomes faster and more efficient. This capability benefits search engines and recommendation systems, which can suggest relevant articles or products based on user interests.
 
@@ -210,8 +214,11 @@ The installed extension 'aks-preview' is in preview.
 
    <pre>az extension update --name aks-preview</pre>
 
-1. Setup Conda environment py310 for Python 3.10 to run in.
-<br /><br />
+1. The deployment must be started by a user who has sufficient permissions to assign roles, such as a `User Access Administrator` or `Owner`.
+
+1. Assign Azure account `Microsoft.Resources/deployments/write` permissions at the subscription level.
+
+
 
 <hr />
 
@@ -219,51 +226,141 @@ The installed extension 'aks-preview' is in preview.
 
 ## Download from GitHub
 
-https://github.com/bomonike/azure-chatgbt/
+1. Navigate to the folder where you want to create a repository from GitHub.com.
 
+   PROTIP: Our team uses the <tt>bomonike</tt> GitHub organization, which is why that name is part of the URL.
 
-<hr />
+2. Download without credentials:
 
-## Azure Terraform Providers
+   <pre><strong>git clone https://github.com/bomonike/azure-chatgbt.git</strong></pre>
 
-The [Azure Deployment Script <tt><strong>resource_deployment_script_azure_cli</strong></tt> at ttps://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli) is used to run the </tt><strong>install-nginx-via-helm-and-create-sa.sh</strong></tt> Bash script which creates the namespace and service account for the sample application and installs the following packages to the AKS cluster via [Helm](https://helm.sh/). For more information on deployment scripts, see [Use deployment scripts](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli)
+   CAUTION: If that repository is not found (being private), please connect with me at<br />
+   <a target="_blank" href="https://linkedin.com/in/wilsonmar">https://linkedin.com/in/wilsonmar</a>
 
-   - [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/)
-   - [Cert-Manager](https://cert-manager.io/docs/)
-   - [Prometheus](https://prometheus.io/)
-   <br /><br />
-
-The [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) can be used to configure infrastructure in [Microsoft Azure](https://azure.microsoft.com/en-us/) using the Azure Resource Manager API's. For more information on the [data sources](https://www.terraform.io/docs/configuration/data-sources.html) and [resources](https://www.terraform.io/docs/configuration/resources.html) supported by the Azure Provider, see the [documentation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs). To learn the basics of Terraform using this provider, follow the hands-on [get started tutorials](https://learn.hashicorp.com/tutorials/terraform/infrastructure-as-code?in=terraform/azure-get-started). If you are interested in the [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)'s latest features, see the [changelog](https://github.com/hashicorp/terraform-provider-azurerm/blob/main/CHANGELOG.md) for version information and release notes.
 
 
 <hr />
 
 ## GitHub Workflow Actions
 
-In the <tt>.github/workflow</tt> folder are GitHub Actions to build and deploy.
-
-GitHub Actions run shell (.sh) files in the <tt>scripts</tt> folder:
+TODO: In the <tt>.github/workflow</tt> folder are GitHub Actions files that run shell (.sh) files in the <tt>scripts</tt> folder to automate build and deploy.
 
    * install-packages-for-chainlin-demo.sh
    <br /><br />
 
+1. TODO: Add a step in the GitHub workflow to create a SBOM (Software Bill of Materials) by iteratively (exhaustively) following the chain of packages referenced in each program. This would add many more to the list of 138 in the file. This enables raising an alert if any package:
+   
+   * contains code that appears to have gibberish that might be a password, API key, or other secret;
+   * is not of the latest version ;
+   * has an open GitHub Dependabot alert; 
+   * has been found to have a vulnerability;
+   * contains code that can potentially be malicious actions such as exfiltration of data to a possible adversary (such as China, Russia, North Korea, Iran, etc.)
+   <br /><br />
+
+
+
 <hr />
 
-## Build Containers into ACR
+## Customize Variable Values
+
+1. Open a Text Editor (such as Visual Studio Code) to edit the file embedded in all scripts to consistently provide values to system variables referenced:
+
+   <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/00-variables.sh">00-variables.sh</a>
+
+1. Customize the value of each variable: 
+
+   ```bash
+# Variables
+acrName="CoralAcr"
+acrResourceGrougName="CoralRG"
+location="FranceCentral"
+attachAcr=false
+imageName="magic8ball"
+tag="v2"
+containerName="magic8ball"
+image="$acrName.azurecr.io/$imageName:$tag"
+imagePullPolicy="IfNotPresent" # Always, Never, IfNotPresent
+managedIdentityName="OpenAiManagedIdentity"
+federatedIdentityName="Magic8BallFederatedIdentity"
+
+# Azure Subscription and Tenant
+subscriptionId=$(az account show --query id --output tsv)
+subscriptionName=$(az account show --query name --output tsv)
+tenantId=$(az account show --query tenantId --output tsv)
+
+# Parameters
+title="Magic 8 Ball"
+label="Pose your question and cross your fingers!"
+temperature="0.9"
+imageWidth="80"
+
+# OpenAI
+openAiName="CoralOpenAi "
+openAiResourceGroupName="CoralRG"
+openAiType="azure_ad"
+openAiBase="https://coralopenai.openai.azure.com/"
+openAiModel="gpt-35-turbo"
+openAiDeployment="gpt-35-turbo"
+
+# Nginx Ingress Controller
+nginxNamespace="ingress-basic"
+nginxRepoName="ingress-nginx"
+nginxRepoUrl="https://kubernetes.github.io/ingress-nginx"
+nginxChartName="ingress-nginx"
+nginxReleaseName="nginx-ingress"
+nginxReplicaCount=3
+
+# Certificate Manager
+cmNamespace="cert-manager"
+cmRepoName="jetstack"
+cmRepoUrl="https://charts.jetstack.io"
+cmChartName="cert-manager"
+cmReleaseName="cert-manager"
+
+# Cluster Issuer
+email="paolos@microsoft.com"
+clusterIssuerName="letsencrypt-nginx"
+clusterIssuerTemplate="cluster-issuer.yml"
+
+# AKS Cluster
+aksClusterName="CoralAks"
+aksResourceGroupName="CoralRG"
+
+# Sample Application
+namespace="magic8ball"
+serviceAccountName="magic8ball-sa"
+deploymentTemplate="deployment.yml"
+serviceTemplate="service.yml"
+configMapTemplate="configMap.yml"
+secretTemplate="secret.yml"
+
+# Ingress and DNS
+ingressTemplate="ingress.yml"
+ingressName="magic8ball-ingress"
+dnsZoneName="contoso.com"
+dnsZoneResourceGroupName="DnsResourceGroup"
+subdomain="magic8ball"
+host="$subdomain.$dnsZoneName"
+   ```
+
+1. TODO: "${RESC_GROUP_NAME}"
+
+
+
+<hr />
+
+## Build Custom Docker Containers into ACR
 
 The [Azure Container Registry (ACR)](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) is used to build, store, and manage container images and other artefacts in a private registry for deployments to Kubernetes. See https://wilsonmar.github.io/kubernetes
 
-Each cluster contains the following Docker containers and Kubernetes services:
+   <ul><a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/Dockerfile">https://github.com/bomonike/azure-chatgbt/tree/main/scripts/Dockerfile</a> 
+   </ul>
 
-![Application Architecture](images/workload.png)
+1. Ensure that the Docker client is running.
 
-All the above containers is represented by one of group of purple icons at the right side of the <a href="#Infrastructure-Architecture-DiagramInfrastructure Architecture Diagram (below)</a>.
+1. Review the Dockerfile (at time of this writing, the file's contents):
 
-### 01-build-docker-image.sh
-
-1. Build container images using the `Dockerfile` and `01-build-docker-image.sh` in the `scripts` folder.
-
-```bash
+   ```bash
 # app/Dockerfile
 
 # # Stage 1 - Install build dependencies
@@ -360,99 +457,121 @@ HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 ```
 
-### 01-build-docker-image.sh
+   PROTIPS:
+
+1. TODO: Instead of using VirtualEnv, substitute use of Miniconda3 and download from the Conda rather than PyPi :
+ 
+   <tt>RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+   </tt>
+
+1. Instead: TODO: Setup Conda environment "py311" for Python 3.11 from Conda.
+
+1. TODO: Use Conda to load packages in the Conda library specified in the <tt>requirements.txt</tt> file at:
+
+   <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/requirements.txt">https://github.com/bomonike/azure-chatgbt/blob/main/scripts/requirements.txt</a>
+
+1. QUESTION: <tt>ENTRYPOINT ["streamlit"</tt>
+
+
+### ../scripts/01-build-docker-image.sh
+
+Run `01-build-docker-image.sh` in the `scripts` folder to build container images using the `Dockerfile` referencing various <tt>yaml</tt> files in the same folder:
 
    ```bash
 #!/bin/bash
-&nbsp;
+
 # Variables
 source ./00-variables.sh
-&nbsp;
+
 # Build the docker image
 docker build -t $imageName:$tag -f Dockerfile .
   ```
 
-Before running any script, make sure to customize the value of the variables inside the `00-variables.sh` file. This file is embedded in all the scripts and contains the following variables:
+<hr />
 
-```bash
-# Variables
-acrName="CoralAcr"
-acrResourceGrougName="CoralRG"
-location="FranceCentral"
-attachAcr=false
-imageName="magic8ball"
-tag="v2"
-containerName="magic8ball"
-image="$acrName.azurecr.io/$imageName:$tag"
-imagePullPolicy="IfNotPresent" # Always, Never, IfNotPresent
-managedIdentityName="OpenAiManagedIdentity"
-federatedIdentityName="Magic8BallFederatedIdentity"
+## Fabric Data to Vector database
 
-# Azure Subscription and Tenant
-subscriptionId=$(az account show --query id --output tsv)
-subscriptionName=$(az account show --query name --output tsv)
-tenantId=$(az account show --query tenantId --output tsv)
+At time of writing, components need to be added to store in <a target="_blank" href="https://wilsonmar.github.io/microsoft-fabric/">Microsoft Fabric</a> OneLake and reference the Finance, Customer, Telemetry, or Semantic KPIs in the vector database for access by our app.
 
-# Parameters
-title="Magic 8 Ball"
-label="Pose your question and cross your fingers!"
-temperature="0.9"
-imageWidth="80"
 
-# OpenAI
-openAiName="CoralOpenAi "
-openAiResourceGroupName="CoralRG"
-openAiType="azure_ad"
-openAiBase="https://coralopenai.openai.azure.com/"
-openAiModel="gpt-35-turbo"
-openAiDeployment="gpt-35-turbo"
-
-# Nginx Ingress Controller
-nginxNamespace="ingress-basic"
-nginxRepoName="ingress-nginx"
-nginxRepoUrl="https://kubernetes.github.io/ingress-nginx"
-nginxChartName="ingress-nginx"
-nginxReleaseName="nginx-ingress"
-nginxReplicaCount=3
-
-# Certificate Manager
-cmNamespace="cert-manager"
-cmRepoName="jetstack"
-cmRepoUrl="https://charts.jetstack.io"
-cmChartName="cert-manager"
-cmReleaseName="cert-manager"
-
-# Cluster Issuer
-email="paolos@microsoft.com"
-clusterIssuerName="letsencrypt-nginx"
-clusterIssuerTemplate="cluster-issuer.yml"
-
-# AKS Cluster
-aksClusterName="CoralAks"
-aksResourceGroupName="CoralRG"
-
-# Sample Application
-namespace="magic8ball"
-serviceAccountName="magic8ball-sa"
-deploymentTemplate="deployment.yml"
-serviceTemplate="service.yml"
-configMapTemplate="configMap.yml"
-secretTemplate="secret.yml"
-
-# Ingress and DNS
-ingressTemplate="ingress.yml"
-ingressName="magic8ball-ingress"
-dnsZoneName="contoso.com"
-dnsZoneResourceGroupName="DnsResourceGroup"
-subdomain="magic8ball"
-host="$subdomain.$dnsZoneName"
-```
 
 <hr />
 
-### Upload Docker container image to Azure Container Registry (ACR)
+## Kubernetes Components
 
-You can push the Docker container image to Azure Container Registry (ACR) using the `03-push-docker-image.sh` script in the `scripts` folder.
+Each cluster contains the following Docker containers and Kubernetes services:
+
+![Application Architecture](images/workload.png)
+
+All the above containers is represented by one of group of purple icons at the right side of the diagram above and at the <a href="#Infrastructure-Architecture-Diagram">Infrastructure Architecture Diagram (below)</a>.
+
+   * chat-configmap.yml
+   * chat-deployment.yml
+   * chat-ingress.yml
+   * chat-service.yml
+
+   * chat.py
+
+   * cluster-issuer-webapprouting.yml
+   * cluster-issuer-nginx.yml
+
+   * docs-configmap.yml
+   * docs-deployment.yml
+   * docs-ingress.yml
+   * docs-service.yml
+
+   * docs.py
+   * chainlit.md
+
+
+<a name="Terraform-Providers"></a>
+
+## Terraform Providers
+
+The [Azure Deployment Script <tt><strong>resource_deployment_script_azure_cli</strong></tt> at ttps://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli) is used to run the </tt><strong>install-nginx-via-helm-and-create-sa.sh</strong></tt> Bash script which creates the namespace and service account for the sample application and installs the following packages to the AKS cluster via [Helm](https://helm.sh/). For more information from Terraform about deployment scripts, see [azurerm_resource_deployment_script_azure_cli](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli)
+
+   - [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/)
+   - [Cert-Manager](https://cert-manager.io/docs/)
+   - [Prometheus](https://prometheus.io/)
+   <br /><br />
+
+The [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) can be used to configure infrastructure in [Microsoft Azure](https://azure.microsoft.com/en-us/) using the Azure Resource Manager (ARM) API's. For more information on the [data sources](https://www.terraform.io/docs/configuration/data-sources.html) and [resources](https://www.terraform.io/docs/configuration/resources.html) supported by the Azure Provider, see the [documentation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs). To learn the basics of Terraform using this provider, follow the hands-on [get started tutorials](https://learn.hashicorp.com/tutorials/terraform/infrastructure-as-code?in=terraform/azure-get-started). If you are interested in the [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)'s latest features, see the [changelog](https://github.com/hashicorp/terraform-provider-azurerm/blob/main/CHANGELOG.md) for version information and release notes.
+
+
+
+<hr />
+
+## Terraform Modules
+
+Terraform (.tf modules to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). The following diagram shows the architecture and network topology deployed by the sample:
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/01-build-docker-images.sh">01-build-docker-images.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/02-run-docker-container.sh">02-run-docker-container.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/03-push-docker-image.sh<">03-push-docker-image.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/04-create-nginx-ingress-controller.sh">04-create-nginx-ingress-controller.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/05-install-cert-manager.sh">05-install-cert-manager.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/06-create-cluster-issuers.sh">06-create-cluster-issuers.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/07-create-workload-managed-identity.sh">07-create-workload-managed-identity.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/08-create-service-account.sh">08-create-service-account.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/09-deploy-apps.sh<">09-deploy-apps.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/10-configure-dns.sh">10-configure-dns.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/install-packages-for-chainlit-demo.sh">install-packages-for-chainlit-demo.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/install-packages-for-chainlit-demo.sh">install-packages-for-chainlit-demo.sh</a> 
+
+
+<hr />
 
 ### 03-push-docker-image.sh
 
@@ -614,6 +733,8 @@ module "openai_private_endpoint" {
 
 1. [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault): an Azure Key Vault used to store secrets, certificates, and keys that can be mounted as files by pods using [Azure Key Vault Provider for Secrets Store CSI Driver](https://github.com/Azure/secrets-store-csi-driver-provider-azure). For more information, see [Use the Azure Key Vault Provider for Secrets Store CSI Driver in an AKS cluster](https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-driver) and [Provide an identity to access the Azure Key Vault Provider for Secrets Store CSI Driver](https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-identity-access).
 
+   TODO: Read sensitive configuration data such as passwords or SSH keys from a pre-existing Azure Key Vault resource. For more information, see [Referencing Azure Key Vault secrets in Terraform](https://thomasthornton.cloud/2022/02/26/referencing-azure-key-vault-secrets-in-terraform/).
+
    ### Azure OpenAI Service
 
 1. [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account): an [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) with a [GPT-3.5](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo) model used by the chatbot application. Azure OpenAI Service gives customers advanced language AI with OpenAI GPT-4, GPT-3, Codex, and DALL-E models with the security and enterprise promise of Azure. Azure OpenAI co-develops the APIs with OpenAI, ensuring compatibility and a smooth transition from one to the other.
@@ -652,20 +773,6 @@ module "openai_private_endpoint" {
 
 <hr />
 
-## Configure custom values
-
-Terraform (.tf modules to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). The following diagram shows the architecture and network topology deployed by the sample:
-
-
-1. The deployment must be started by a user who has sufficient permissions to assign roles, such as a `User Access Administrator` or `Owner`.
-
-1. Assign Azure account `Microsoft.Resources/deployments/write` permissions at the subscription level.
-
-1. RESC_GROUP_NAME
-
-
-<hr />
-
 ## Run Terraform
 
 The repo provides a template show how to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) using [Terraform](https://www.terraform.io/) modules with the [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) Terraform Provider and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of a [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). For a Bicep version of the demo, see [How to deploy and run an Azure OpenAI ChatGPT application on AKS via Bicep](https://github.com/Azure-Samples/aks-openai).
@@ -675,9 +782,11 @@ In a production environment, we strongly recommend deploying a [private AKS clus
 
 Before deploying the Terraform modules in the `terraform` folder, 
 
-1. Specify a value for the following variables in the [terraform.tfvars](https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files) variable definitions file.
+1. Specify a value for the variables in this file:
 
-```terraform
+   [terraform.tfvars](https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files) 
+
+   ```terraform
 name_prefix            = "magic8ball"
 domain                 = "contoso.com"
 subdomain              = "magic"
@@ -687,29 +796,27 @@ ssh_public_key         = "XXXXXXX"
 vm_enabled             = true
 location               = "westeurope"
 admin_group_object_ids = ["XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"] 
-```
+   ```
 
-**Description**
+   **Description**
 
-- `prefix`: specifies a prefix for all the Azure resources.
+   - `prefix`: specifies a prefix for all the Azure resources.
 
-- `domain`: specifies the domain part (e.g., subdomain.domain) of the hostname of the ingress object used to expose the chatbot via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/).
+   - `domain`: specifies the domain part (e.g., subdomain.domain) of the hostname of the ingress object used to expose the chatbot via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/).
 
-- `subdomain`: specifies the subdomain part of the hostname of the ingress object used to expose the chatbot via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/).
+   - `subdomain`: specifies the subdomain part of the hostname of the ingress object used to expose the chatbot via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/).
 
-- `namespace`: specifies the namespace of the workload application that accesses the Azure OpenAI Service.
+   - `namespace`: specifies the namespace of the workload application that accesses the Azure OpenAI Service.
 
-- `service_account_name`: specifies the name of the service account of the workload application that accesses the Azure OpenAI Service.
+   - `service_account_name`: specifies the name of the service account of the workload application that accesses the Azure OpenAI Service.
 
-- `ssh_public_key`: specifies the SSH public key used for the AKS nodes and jumpbox virtual machine.
+   - `ssh_public_key`: specifies the SSH public key used for the AKS nodes and jumpbox virtual machine.
 
-- `vm_enabled`: a boleean value that specifies whether deploying or not a jumpbox virtual machine in the same virtual network of the AKS cluster.
+   - `vm_enabled`: a boleean value that specifies whether deploying or not a jumpbox virtual machine in the same virtual network of the AKS cluster.
 
-- `location`: specifies the region (e.g., westeurope) where deploying the Azure resources.
+   - `location`: specifies the region (e.g., westeurope) where deploying the Azure resources.
 
-- `admin_group_object_ids`: when deploying an AKS cluster with Azure AD and Azure RBAC integration, this array parameter contains the list of Azure AD group object IDs that will have the admin role of the cluster.
-
-PROTIP: We suggest reading sensitive configuration data such as passwords or SSH keys from a pre-existing Azure Key Vault resource. For more information, see [Referencing Azure Key Vault secrets in Terraform](https://thomasthornton.cloud/2022/02/26/referencing-azure-key-vault-secrets-in-terraform/).
+   - `admin_group_object_ids`: when deploying an AKS cluster with Azure AD and Azure RBAC integration, this array parameter contains the list of Azure AD group object IDs that will have the admin role of the cluster.
 
 Before proceeding, also make sure to run the `register-preview-features.sh` Bash script in the `terraform` folder to register any preview feature used by the AKS cluster.
 
