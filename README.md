@@ -1,4 +1,4 @@
-Create a C#-based chatbot calling OpenAI Chainlit REST/gPRC APIs from within Azure resources created using Terraform: Entra, Key Vault, NGNIX, NAT Gateway, public &amp; private endpoints, Container Registry, Azure Kubernetes Service (AKS), Prometheus, Grafana.
+Create a Python-based chatbot calling OpenAI Chainlit REST/gPRC APIs from within Azure resources created using Terraform: Entra, Key Vault, NGNIX, NAT Gateway, public &amp; private endpoints, Container Registry, Azure Kubernetes Service (AKS), Prometheus, Grafana.
 
 ## Let's build this
 
@@ -167,14 +167,6 @@ B. The <strong>Docs app</strong> ???
 - [Weaviate](https://weaviate.io/): Weaviate is an open-source vector database used to store data objects and vector embeddings from ML-models, and scale into billions of data objects from the same name company in Amsterdam. Users can index billions of data objects to search through and combine multiple search techniques, such as keyword-based and vector search, to provide search experiences.
 
 
-NOTE: The apps here are not voice-enabled such as Amazon Alexa, Apple Siri, etc. which makes use of a voice-only  interface:
-   * Voice Recognition
-   * Speech-to-Text 
-   * Text to Speech
-   <br /><br />
-
-
-
 <hr />
 
 ## Fabric Data to Vector store
@@ -191,6 +183,14 @@ We add custom vector embeddings so that the Chat can answer questions about tele
 
 For more about this topic:
    * https://www.datacamp.com/tutorial/chromadb-tutorial-step-by-step-guide
+   <br /><br />
+
+NOTE: The scope of apps here are not voice-enabled such as <a target="_blank" href="https://wilsonmar.github.io/alexa">Amazon Alexa</a>, Apple Siri, etc. which makes use of the <a target="_blank" href="https://azure.microsoft.com/en-us/products/ai-services/ai-speech/#features">Azure AI Speech service</a> through the <a target="_blank" href="https://speech.microsoft.com/portal">Azure Speech Studio</a> SDK:
+
+   * Speaker voice Recognition
+   * <a target="_blank" href="https://speech.microsoft.com/portal/whisperspeechtotext">OpenAI Whisper</a> Speech-to-Text
+   * Speech translation
+   * Text-to-Speech
    <br /><br />
 
 
