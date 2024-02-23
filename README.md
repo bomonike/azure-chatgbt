@@ -246,11 +246,13 @@ The [Azure Container Registry (ACR)](https://registry.terraform.io/providers/has
    
 <hr />
 
-## Infrastructure Architecture Diagram
+## Infrastructure Architecture
 
 The github repo downloaded provides a set of scripts invoking Terraform modules to deploy the following resources within Azure:
 
 <a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1708631833/azure-chatbot-240221-1920x1080_kmm3pu.png"><img alt="azure-chatbot-240221-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1708631833/azure-chatbot-240221-1920x1080_kmm3pu.png"></a>
+
+The diagram above is based on Paolo's <a target="_blank href="https://github.com/paolosalvatori/aks-openai-chainlit-terraform/blob/main/visio/architecture.vsdx">vsdx</a> as referenced <a target="_blank" href="https://techcommunity.microsoft.com/t5/fasttrack-for-azure/create-an-azure-openai-langchain-chromadb-and-chainlit-chat-app/ba-p/4024070createdJan8-2024">in his blog</a>.
 
 ### IAM
 
@@ -346,12 +348,12 @@ The github repo downloaded provides a set of scripts invoking Terraform modules 
 
 ## Build
 
-- [Azure Deployment Script](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli): a deployment script is used to run the `install-nginx-via-helm-and-create-sa.sh` Bash script which creates the namespace and service account for the sample application and installs the following packages to the AKS cluster via [Helm](https://helm.sh/). For more information on deployment scripts, see [Use deployment scripts](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli)
-  - [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/)
-  - [Cert-Manager](https://cert-manager.io/docs/)
-  - [Prometheus](https://prometheus.io/)
+The [Azure Deployment Script <tt><strong>resource_deployment_script_azure_cli</strong></tt> at ttps://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli) is used to run the </tt><strong>install-nginx-via-helm-and-create-sa.sh</strong></tt> Bash script which creates the namespace and service account for the sample application and installs the following packages to the AKS cluster via [Helm](https://helm.sh/). For more information on deployment scripts, see [Use deployment scripts](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli)
 
-The <a href="#Architecture-Diagram">Architecture Diagram above</a> is based on Paolo's <a target="_blank href="https://github.com/paolosalvatori/aks-openai-chainlit-terraform/blob/main/visio/architecture.vsdx">vsdx</a> as referenced <a target="_blank" href="https://techcommunity.microsoft.com/t5/fasttrack-for-azure/create-an-azure-openai-langchain-chromadb-and-chainlit-chat-app/ba-p/4024070createdJan8-2024">in his blog</a>.
+   - [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/)
+   - [Cert-Manager](https://cert-manager.io/docs/)
+   - [Prometheus](https://prometheus.io/)
+   <br /><br />
 
 The is sample shows how to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) using [Terraform](https://www.terraform.io/) modules with the [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) Terraform Provider and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of a [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). For a Bicep version of the demo, see [How to deploy and run an Azure OpenAI ChatGPT application on AKS via Bicep](https://github.com/Azure-Samples/aks-openai).
 
