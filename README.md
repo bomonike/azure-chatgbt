@@ -9,18 +9,23 @@ Here are the steps to make this happen:
    1. <a href="#Prompts">Prompts</a>
    1. <a href="#Chainlit">Chainlit</a>
    1. <a href="#LangChain">LangChain</a>
-   1. <a href="#ChromeDB">ChromeDB</a>
+   1. <a href="#ChromaDB">ChromaDB</a>
    1. <a href="#Other-Vector-Databases">Other Vector Databases</a>
    <br /><br />
 
 1. <a href="#Install-Prerequisite-Utilities">Install Perequisite Utilities</a>
 1. <a href="#Download">Download from GitHub</a>
 
-1. <a href="#Azure Terraform Providers">Azure Terraform Providers</a>
+1. <a href="#Azure-Terraform-Providers">Azure Terraform Providers</a>
+1. <a href="#GitHub-Workflow-actions">GitHub Workflow Actions</a>
 1. <a href="#Build-Running-Containers">Build Running Containers</a>
 1. <a href="#Build-Kubernetes">Build Kubernetes</a>
 
 1. <a href="#Infrastructure-Architecture-Diagram"> Infrastructure Architecture Diagram</a>
+   <a href="#Private-Endpoints">Private Endpoints</a>
+   <a href="#Private-Endpoints">Private Endpoints</a>
+   <a href="#Private-Endpoints">Private Endpoints</a>
+   <a href="#Private-Endpoints">Private Endpoints</a>
 
 1. <a href="#Configure">Configure custom values</a>
 1. <a href="#Run+Deployment+Scripts">Run Deployment Scripts</a>
@@ -102,7 +107,7 @@ Both make API calls to two AI (Artificial Intelligence) services pretending to b
    - [Cookbook](https://docs.chainlit.io/examples/cookbook)
    <br /><br />
 
-   The "Docs Application" container setup and run by this repo additionally contains an instance of the LangChain and <a href="#ChromeDB">"ChromeDB"</a>  <a href="#Vector=Databases">Vector Database</a>.
+   The "Docs Application" container setup and run by this repo additionally contains an instance of the LangChain and <a href="#ChromaDB">"ChromaDB"</a>  <a href="#Vector=Databases">Vector Database</a>.
 
    ### LangChain
 
@@ -112,7 +117,7 @@ Both make API calls to two AI (Artificial Intelligence) services pretending to b
 
    LangChain's integrations cover an extensive range of systems, tools, and services, making it a comprehensive solution for language model-based applications. LangChain integrates with the major cloud platforms such as Microsoft Azure, Amazon AWS, and Google, and with API wrappers for various purposes like news, movie information, and weather, as well as support for Bash, web scraping, and more. It also supports multiple language models, including those from OpenAI, Anthropic, and Hugging Face. Moreover, LangChain offers various functionalities for document handling, code generation, analysis, debugging, and interaction with databases and other data sources.
 
-   ### ChromeDB
+   ### ChromaDB
 
    A [vector database](https://learn.microsoft.com/en-us/semantic-kernel/memories/vector-db) is a specialized database that goes beyond traditional storage by organizing information to simplify the search for similar items. Instead of merely storing words or numbers, it leverages vector embeddings - unique numerical representations of data. These embeddings capture meaning, context, and relationships. For instance, words are represented as vectors, whereas similar words have similar vector values.
 
@@ -124,9 +129,9 @@ Both make API calls to two AI (Artificial Intelligence) services pretending to b
 
    This sample makes of the [ChromaDB](https://docs.trychroma.com/) vector database, but you can easily modify the code to use another vector database. You can even use [Azure Cache for Redis Enterprise](https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/cache-overview) to store the vector embeddings and compute vector similarity with high performance and low latency. For more information, see [Vector Similarity Search with Azure Cache for Redis Enterprise](https://techcommunity.microsoft.com/t5/azure-developer-community-blog/vector-similarity-search-with-azure-cache-for-redis-enterprise/ba-p/3822059)
 
-   [ChromaDB](https://docs.trychroma.com/) is a powerful database solution that stores and retrieves vector embeddings efficiently. It is commonly used in AI applications, including chatbots and document analysis systems. By storing embeddings in ChromaDB, users can easily search and retrieve similar vectors, enabling faster and more accurate matching or recommendation processes. ChromaDB offers excellent scalability high performance, and supports various indexing techniques to optimize search operations. It is a versatile tool that enhances the functionality and efficiency of AI applications that rely on vector embeddings.<hr />
+   [ChromaDB](https://docs.trychroma.com/) stores and retrieves <strong>vector embeddings</strong> to add private data to LLMs. It is commonly used in AI applications, including chatbots and document analysis systems. By storing embeddings in ChromaDB, users can easily search and retrieve similar vectors, enabling faster and more accurate matching or recommendation processes. ChromaDB offers excellent scalability high performance, and supports various indexing techniques to optimize search operations. It is a versatile tool that enhances the functionality and efficiency of AI applications that rely on vector embeddings.<hr />
 
-For more information on Azure OpenAI Service and Large Language Models (LLMs), see:
+For more information on the Azure OpenAI Service and Large Language Models (LLMs), see:
 
    - [What is Azure OpenAI Service?](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview)
    - [Azure OpenAI Service models](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models)
@@ -233,13 +238,251 @@ The [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/l
 
 <hr />
 
+## GitHub Workflow Actions
+
+In the <tt>.github/workflow</tt> folder are GitHub Actions to build and deploy.
+
+GitHub Actions run shell (.sh) files in the <tt>scripts</tt> folder:
+
+   * install-packages-for-chainlin-demo.sh
+   <br /><br />
+
+<hr />
+
 ## Build Containers into ACR
 
-This repo sets up cluster of Docker containers:
+The [Azure Container Registry (ACR)](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) is used to build, store, and manage container images and other artefacts in a private registry for deployments to Kubernetes. See https://wilsonmar.github.io/kubernetes
+
+Each cluster contains the following Docker containers and Kubernetes services:
 
 ![Application Architecture](images/workload.png)
 
-The [Azure Container Registry (ACR)](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) is used to build, store, and manage container images and other artefacts in a private registry for deployments to Kubernetes.
+All the above containers is represented by one of group of purple icons at the right side of the <a href="#Infrastructure-Architecture-DiagramInfrastructure Architecture Diagram (below)</a>.
+
+### 01-build-docker-image.sh
+
+1. Build container images using the `Dockerfile` and `01-build-docker-image.sh` in the `scripts` folder.
+
+```bash
+# app/Dockerfile
+
+# # Stage 1 - Install build dependencies
+
+# A Dockerfile must start with a FROM instruction which sets the base image for the container.
+# The Python images come in many flavors, each designed for a specific use case.
+# The python:3.11-slim image is a good base image for most applications.
+# It is a minimal image built on top of Debian Linux and includes only the necessary packages to run Python.
+# The slim image is a good choice because it is small and contains only the packages needed to run Python.
+# For more information, see: 
+# * https://hub.docker.com/_/python 
+# * https://docs.streamlit.io/knowledge-base/tutorials/deploy/docker
+FROM python:3.11-slim AS builder
+
+# The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile.
+# If the WORKDIR doesn’t exist, it will be created even if it’s not used in any subsequent Dockerfile instruction.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#workdir
+WORKDIR /app
+
+# Set environment variables. 
+# The ENV instruction sets the environment variable <key> to the value <value>.
+# This value will be in the environment of all “descendant” Dockerfile commands and can be replaced inline in many as well.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#env
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Install git so that we can clone the app code from a remote repo using the RUN instruction.
+# The RUN comand has 2 forms:
+# * RUN <command> (shell form, the command is run in a shell, which by default is /bin/sh -c on Linux or cmd /S /C on Windows)
+# * RUN ["executable", "param1", "param2"] (exec form)
+# The RUN instruction will execute any commands in a new layer on top of the current image and commit the results. 
+# The resulting committed image will be used for the next step in the Dockerfile.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#run
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    software-properties-common \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a virtualenv to keep dependencies together
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Clone the requirements.txt which contains dependencies to WORKDIR
+# COPY has two forms:
+# * COPY <src> <dest> (this copies the files from the local machine to the container's own filesystem)
+# * COPY ["<src>",... "<dest>"] (this form is required for paths containing whitespace)
+# For more information, see: https://docs.docker.com/engine/reference/builder/#copy
+COPY requirements.txt .
+
+# Install the Python dependencies
+RUN pip install --no-cache-dir --no-deps -r requirements.txt
+
+# Stage 2 - Copy only necessary files to the runner stage
+
+# The FROM instruction initializes a new build stage for the application
+FROM python:3.11-slim
+
+# Sets the working directory to /app
+WORKDIR /app
+
+# Copy the virtual environment from the builder stage
+COPY --from=builder /opt/venv /opt/venv
+
+# Set environment variables
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Clone the app.py containing the application code
+COPY app.py .
+
+# Copy the images folder to WORKDIR
+# The ADD instruction copies new files, directories or remote file URLs from <src> and adds them to the filesystem of the image at the path <dest>.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#add
+ADD images ./images
+
+# The EXPOSE instruction informs Docker that the container listens on the specified network ports at runtime.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#expose
+EXPOSE 8501
+
+# The HEALTHCHECK instruction has two forms:
+# * HEALTHCHECK [OPTIONS] CMD command (check container health by running a command inside the container)
+# * HEALTHCHECK NONE (disable any healthcheck inherited from the base image)
+# The HEALTHCHECK instruction tells Docker how to test a container to check that it is still working. 
+# This can detect cases such as a web server that is stuck in an infinite loop and unable to handle new connections, 
+# even though the server process is still running. For more information, see: https://docs.docker.com/engine/reference/builder/#healthcheck
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+
+# The ENTRYPOINT instruction has two forms:
+# * ENTRYPOINT ["executable", "param1", "param2"] (exec form, preferred)
+# * ENTRYPOINT command param1 param2 (shell form)
+# The ENTRYPOINT instruction allows you to configure a container that will run as an executable.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#entrypoint
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+```
+
+### 01-build-docker-image.sh
+
+   ```bash
+#!/bin/bash
+&nbsp;
+# Variables
+source ./00-variables.sh
+&nbsp;
+# Build the docker image
+docker build -t $imageName:$tag -f Dockerfile .
+  ```
+
+Before running any script, make sure to customize the value of the variables inside the `00-variables.sh` file. This file is embedded in all the scripts and contains the following variables:
+
+```bash
+# Variables
+acrName="CoralAcr"
+acrResourceGrougName="CoralRG"
+location="FranceCentral"
+attachAcr=false
+imageName="magic8ball"
+tag="v2"
+containerName="magic8ball"
+image="$acrName.azurecr.io/$imageName:$tag"
+imagePullPolicy="IfNotPresent" # Always, Never, IfNotPresent
+managedIdentityName="OpenAiManagedIdentity"
+federatedIdentityName="Magic8BallFederatedIdentity"
+
+# Azure Subscription and Tenant
+subscriptionId=$(az account show --query id --output tsv)
+subscriptionName=$(az account show --query name --output tsv)
+tenantId=$(az account show --query tenantId --output tsv)
+
+# Parameters
+title="Magic 8 Ball"
+label="Pose your question and cross your fingers!"
+temperature="0.9"
+imageWidth="80"
+
+# OpenAI
+openAiName="CoralOpenAi "
+openAiResourceGroupName="CoralRG"
+openAiType="azure_ad"
+openAiBase="https://coralopenai.openai.azure.com/"
+openAiModel="gpt-35-turbo"
+openAiDeployment="gpt-35-turbo"
+
+# Nginx Ingress Controller
+nginxNamespace="ingress-basic"
+nginxRepoName="ingress-nginx"
+nginxRepoUrl="https://kubernetes.github.io/ingress-nginx"
+nginxChartName="ingress-nginx"
+nginxReleaseName="nginx-ingress"
+nginxReplicaCount=3
+
+# Certificate Manager
+cmNamespace="cert-manager"
+cmRepoName="jetstack"
+cmRepoUrl="https://charts.jetstack.io"
+cmChartName="cert-manager"
+cmReleaseName="cert-manager"
+
+# Cluster Issuer
+email="paolos@microsoft.com"
+clusterIssuerName="letsencrypt-nginx"
+clusterIssuerTemplate="cluster-issuer.yml"
+
+# AKS Cluster
+aksClusterName="CoralAks"
+aksResourceGroupName="CoralRG"
+
+# Sample Application
+namespace="magic8ball"
+serviceAccountName="magic8ball-sa"
+deploymentTemplate="deployment.yml"
+serviceTemplate="service.yml"
+configMapTemplate="configMap.yml"
+secretTemplate="secret.yml"
+
+# Ingress and DNS
+ingressTemplate="ingress.yml"
+ingressName="magic8ball-ingress"
+dnsZoneName="contoso.com"
+dnsZoneResourceGroupName="DnsResourceGroup"
+subdomain="magic8ball"
+host="$subdomain.$dnsZoneName"
+```
+
+<hr />
+
+### Upload Docker container image to Azure Container Registry (ACR)
+
+You can push the Docker container image to Azure Container Registry (ACR) using the `03-push-docker-image.sh` script in the `scripts` folder.
+
+### 03-push-docker-image.sh
+
+```bash
+#!/bin/bash
+
+# Variables
+source ./00-variables.sh
+
+# Login to ACR
+az acr login --name $acrName 
+
+# Retrieve ACR login server. Each container image needs to be tagged with the loginServer name of the registry. 
+loginServer=$(az acr show --name $acrName --query loginServer --output tsv)
+
+# Tag the local image with the loginServer of ACR
+docker tag ${imageName,,}:$tag $loginServer/${imageName,,}:$tag
+
+# Push latest container image to ACR
+docker push $loginServer/${imageName,,}:$tag
+```
+
+
+### Cert-Manager
+
+1. [Cert-Manager](https://cert-manager.io/docs/): the Kubernetes `cert-manager` package and [Let's Encrypt](https://letsencrypt.org/) certificate authority are used to issue a TLS/SSL certificate to the chat applications.
+
+   ### Let's Encrypt
+
+1. Let's encrypt creates free SSL/TLS certificate so websites can communicate using HTTPS (secure HTTP).
 
 
 <hr />
@@ -262,7 +505,7 @@ The [Azure Container Registry (ACR)](https://registry.terraform.io/providers/has
    
 <hr />
 
-## Infrastructure Architecture
+## Infrastructure Architecture Diagram
 
 The github repo downloaded provides a set of scripts invoking Terraform modules to deploy the following resources within Azure:
 
@@ -270,7 +513,8 @@ The github repo downloaded provides a set of scripts invoking Terraform modules 
 
 The diagram above is based on Paolo's <a target="_blank" href="https://github.com/paolosalvatori/aks-openai-chainlit-terraform/blob/main/visio/architecture.vsdx">vsdx</a> as referenced <a target="_blank" href="https://techcommunity.microsoft.com/t5/fasttrack-for-azure/create-an-azure-openai-langchain-chromadb-and-chainlit-chat-app/ba-p/4024070createdJan8-2024">in his blog</a>.
 
-### IAM
+
+   ### IAM
 
 1. [User-defined Managed Identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity): a user-defined managed identity used by the AKS cluster to create additional resources like load balancers and managed disks in Azure.
 
@@ -292,6 +536,8 @@ The diagram above is based on Paolo's <a target="_blank" href="https://github.co
 
 1. [Azure NAT Gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway): a bring-your-own (BYO) [Azure NAT Gateway](https://learn.microsoft.com/en-us/azure/virtual-network/nat-gateway/nat-overview) to manage outbound connections initiated by AKS-hosted workloads. The NAT Gateway is associated to the `SystemSubnet`, `UserSubnet`, and `PodSubnet` subnets. The [outboundType](https://learn.microsoft.com/en-us/azure/aks/egress-outboundtype#outbound-type-of-managednatgateway-or-userassignednatgateway) property of the cluster is set to `userAssignedNatGateway` to specify that a BYO NAT Gateway is used for outbound connections. NOTE: you can update the `outboundType` after cluster creation and this will deploy or remove resources as required to put the cluster into the new egress configuration. For more information, see [Updating outboundType after cluster creation](https://learn.microsoft.com/en-us/azure/aks/egress-outboundtype#updating-outboundtype-after-cluster-creation-preview).
 
+   ### Private Endpoints
+
 1. [Azure Private Endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint): an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview) is created for each of the following resources:
    - Azure OpenAI Service
    - Azure Container Registry
@@ -299,6 +545,47 @@ The diagram above is based on Paolo's <a target="_blank" href="https://github.co
    - Azure Storage Account
    - API Server when deploying a private AKS cluster.
    <br /><br />
+
+   The `main.tf` module creates [Azure Private Endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) and [Azure Private DNDS Zones](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) for each of the following resources:
+
+   - Azure OpenAI Service
+   - Azure Container Registry
+   - Azure Key Vault
+   - Azure Storage Account
+   <br >/><br />
+
+   In particular, it creates an [Azure Private Endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) and [Azure Private DNDS Zone](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) to the [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account) as shown in the following code snippet:
+
+   ```terraform
+module "openai_private_dns_zone" {
+  source                       = "./modules/private_dns_zone"
+  name                         = "privatelink.openai.azure.com"
+  resource_group_name          = azurerm_resource_group.rg.name
+  tags                         = var.tags
+  virtual_networks_to_link     = {
+    (module.virtual_network.name) = {
+      subscription_id = data.azurerm_client_config.current.subscription_id
+      resource_group_name = azurerm_resource_group.rg.name
+    }
+  }
+}
+
+module "openai_private_endpoint" {
+  source                         = "./modules/private_endpoint"
+  name                           = "${module.openai.name}PrivateEndpoint"
+  location                       = var.location
+  resource_group_name            = azurerm_resource_group.rg.name
+  subnet_id                      = module.virtual_network.subnet_ids[var.vm_subnet_name]
+  tags                           = var.tags
+  private_connection_resource_id = module.openai.id
+  is_manual_connection           = false
+  subresource_name               = "account"
+  private_dns_zone_group_name    = "AcrPrivateDnsZoneGroup"
+  private_dns_zone_group_ids     = [module.acr_private_dns_zone.id]
+}
+   ```
+
+   ### Azure Private DNS Zones
 
 1. [Azure Private DNDS Zones](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone): an [Azure Private DNS Zone](https://docs.microsoft.com/en-us/azure/dns/private-dns-overview) is created for each of the following resources:
    - Azure OpenAI Service
@@ -308,23 +595,28 @@ The diagram above is based on Paolo's <a target="_blank" href="https://github.co
    - API Server when deploying a private AKS cluster.
    <br /><br />
 
-1. [Azure Network Security Group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/network_security_group): subnets hosting virtual machines and Azure Bastion Hosts are protected by [Azure Network Security Groups](https://docs.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview) that are used to filter inbound and outbound traffic.
+   ### Network Security Groups
+
+1. [Azure Network Security Groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/network_security_group): subnets hosting virtual machines and Azure Bastion Hosts are protected by [Azure Network Security Groups](https://docs.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview) that are used to filter inbound and outbound traffic.
+
 
 1. Workload namespace and service account: the [Kubectl Terraform Provider](https://registry.terraform.io/providers/cpanato/kubectl/latest/docs) and [Kubernetes Terraform Provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs) are used to create the namespace and service account used by the chat applications.
 
 
-   ### Storage
+   ### Azure Storage Account
 
-- [Azure Storage Account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account): this storage account is used to store the boot diagnostics logs of both the service provider and service consumer virtual machines. Boot Diagnostics is a debugging feature that allows you to view console output and screenshots to diagnose virtual machine status.
+1. [Azure Storage Account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account): this storage account is used to store the boot diagnostics logs of both the service provider and service consumer virtual machines. Boot Diagnostics is a debugging feature that allows you to view console output and screenshots to diagnose virtual machine status.
 
 
-   ### Utility Services
+   <em><strong>Utility Services:</strong></em>
+
+   ### Azure Key Vault
 
 1. [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault): an Azure Key Vault used to store secrets, certificates, and keys that can be mounted as files by pods using [Azure Key Vault Provider for Secrets Store CSI Driver](https://github.com/Azure/secrets-store-csi-driver-provider-azure). For more information, see [Use the Azure Key Vault Provider for Secrets Store CSI Driver in an AKS cluster](https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-driver) and [Provide an identity to access the Azure Key Vault Provider for Secrets Store CSI Driver](https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-identity-access).
 
-1. [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account): an [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) with a [GPT-3.5](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo) model used by the chatbot application. Azure OpenAI Service gives customers advanced language AI with OpenAI GPT-4, GPT-3, Codex, and DALL-E models with the security and enterprise promise of Azure. Azure OpenAI co-develops the APIs with OpenAI, ensuring compatibility and a smooth transition from one to the other.
+   ### Azure OpenAI Service
 
-1. [Cert-Manager](https://cert-manager.io/docs/): the `cert-manager` package and [Let's Encrypt](https://letsencrypt.org/) certificate authority are used to issue a TLS/SSL certificate to the chat applications.
+1. [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account): an [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) with a [GPT-3.5](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo) model used by the chatbot application. Azure OpenAI Service gives customers advanced language AI with OpenAI GPT-4, GPT-3, Codex, and DALL-E models with the security and enterprise promise of Azure. Azure OpenAI co-develops the APIs with OpenAI, ensuring compatibility and a smooth transition from one to the other.
 
 
    ### Monitoring
@@ -381,23 +673,9 @@ The repo provides a template show how to deploy an [Azure Kubernetes Service(AKS
 In a production environment, we strongly recommend deploying a [private AKS cluster](https://docs.microsoft.com/en-us/azure/aks/private-clusters) with [Uptime SLA](https://docs.microsoft.com/en-us/azure/aks/uptime-sla). For more information, see [private AKS cluster with a Public DNS address](https://docs.microsoft.com/en-us/azure/aks/private-clusters#create-a-private-aks-cluster-with-a-public-dns-address). Alternatively, you can deploy a public AKS cluster and secure access to the API server using [authorized IP address ranges](https://learn.microsoft.com/en-us/azure/aks/api-server-authorized-ip-ranges).
 
 
-## What is Azure OpenAI Service?
+Before deploying the Terraform modules in the `terraform` folder, 
 
-The [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) is a platform offered by Microsoft Azure that provides cognitive services powered by [OpenAI](https://openai.com/) models. One of the models available through this service is the [ChatGPT](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#gpt-4-models) model, which is designed for interactive conversational tasks. It allows developers to integrate natural language understanding and generation capabilities into their applications.
-
-Azure OpenAI Service provides REST API access to OpenAI's powerful language models including the [GPT-3](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#gpt-3-models), [Codex](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#codex-models) and [Embeddings](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#codex-models) model series. In addition, the new [GPT-4](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#gpt-4-models) and [ChatGPT](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo) model series have now reached general availability. These models can be easily adapted to your specific task including but not limited to content generation, summarization, semantic search, and natural language to code translation. Users can access the service through REST APIs, Python SDK, or our web-based interface in the Azure OpenAI Studio.
-
-The [Chat Completion API](https://platform.openai.com/docs/api-reference/chat/create), which is part of the Azure OpenAI Service, provides a dedicated interface for interacting with the [ChatGPT](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo) and [GPT-4 models](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#gpt-4-models). This API is currently in preview and is the preferred method for accessing these models. The GPT-4 models can only be accessed through this API.
-
-[GPT-3](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#gpt-3-models), [GPT-3.5](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo), and [GPT-4](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#gpt-4-models) models from OpenAI are prompt-based. With prompt-based models, the user interacts with the model by entering a text prompt, to which the model responds with a text completion. This completion is the model’s continuation of the input text. While these models are extremely powerful, their behavior is also very sensitive to the prompt. This makes prompt construction an important skill to develop. For more information, see [Introduction to prompt engineering](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/prompt-engineering).
-
-Prompt construction can be difficult. In practice, the prompt acts to configure the model weights to complete the desired task, but it's more of an art than a science, often requiring experience and intuition to craft a successful prompt. The goal of this article is to help get you started with this learning process. It attempts to capture general concepts and patterns that apply to all GPT models. However it's important to understand that each model behaves differently, so the learnings may not apply equally to all models.
-
-Prompt engineering refers to the process of creating instructions called prompts for Large Language Models (LLMs), such as OpenAI’s ChatGPT. With the immense potential of LLMs to solve a wide range of tasks, leveraging prompt engineering can empower us to save significant time and facilitate the development of impressive applications. It holds the key to unleashing the full capabilities of these huge models, transforming how we interact and benefit from them. For more information, see [Prompt engineering techniques](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/advanced-prompt-engineering?pivots=programming-language-chat-completions).
-
-## Deploy the Terraform modules
-
-Before deploying the Terraform modules in the `terraform` folder, specify a value for the following variables in the [terraform.tfvars](https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files) variable definitions file.
+1. Specify a value for the following variables in the [terraform.tfvars](https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files) variable definitions file.
 
 ```terraform
 name_prefix            = "magic8ball"
@@ -414,20 +692,29 @@ admin_group_object_ids = ["XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"]
 **Description**
 
 - `prefix`: specifies a prefix for all the Azure resources.
+
 - `domain`: specifies the domain part (e.g., subdomain.domain) of the hostname of the ingress object used to expose the chatbot via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/).
+
 - `subdomain`: specifies the subdomain part of the hostname of the ingress object used to expose the chatbot via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/).
+
 - `namespace`: specifies the namespace of the workload application that accesses the Azure OpenAI Service.
+
 - `service_account_name`: specifies the name of the service account of the workload application that accesses the Azure OpenAI Service.
+
 - `ssh_public_key`: specifies the SSH public key used for the AKS nodes and jumpbox virtual machine.
+
 - `vm_enabled`: a boleean value that specifies whether deploying or not a jumpbox virtual machine in the same virtual network of the AKS cluster.
+
 - `location`: specifies the region (e.g., westeurope) where deploying the Azure resources.
+
 - `admin_group_object_ids`: when deploying an AKS cluster with Azure AD and Azure RBAC integration, this array parameter contains the list of Azure AD group object IDs that will have the admin role of the cluster.
 
-We suggest reading sensitive configuration data such as passwords or SSH keys from a pre-existing Azure Key Vault resource. For more information, see [Referencing Azure Key Vault secrets in Terraform](https://thomasthornton.cloud/2022/02/26/referencing-azure-key-vault-secrets-in-terraform/).
+PROTIP: We suggest reading sensitive configuration data such as passwords or SSH keys from a pre-existing Azure Key Vault resource. For more information, see [Referencing Azure Key Vault secrets in Terraform](https://thomasthornton.cloud/2022/02/26/referencing-azure-key-vault-secrets-in-terraform/).
 
 Before proceeding, also make sure to run the `register-preview-features.sh` Bash script in the `terraform` folder to register any preview feature used by the AKS cluster.
 
-## OpenAI Terraform Module
+
+### openai.tf
 
 The following table contains the code from the `openai.tf` Terraform module used to deploy the [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account).
 
@@ -519,45 +806,7 @@ This terraform module allows you to pass an array containing the definition of o
 
 As an alternative, you can use the [Terraform module for deploying Azure OpenAI Service.](https://registry.terraform.io/modules/Azure/openai/azurerm/latest) to deploy an [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account).
 
-## Private Endpoints
 
-The `main.tf` module creates [Azure Private Endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) and [Azure Private DNDS Zones](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) for each of the following resources:
-
-- Azure OpenAI Service
-- Azure Container Registry
-- Azure Key Vault
-- Azure Storage Account
-
-In particular, it creates an [Azure Private Endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) and [Azure Private DNDS Zone](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) to the [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account) as shown in the following code snippet:
-
-```terraform
-module "openai_private_dns_zone" {
-  source                       = "./modules/private_dns_zone"
-  name                         = "privatelink.openai.azure.com"
-  resource_group_name          = azurerm_resource_group.rg.name
-  tags                         = var.tags
-  virtual_networks_to_link     = {
-    (module.virtual_network.name) = {
-      subscription_id = data.azurerm_client_config.current.subscription_id
-      resource_group_name = azurerm_resource_group.rg.name
-    }
-  }
-}
-
-module "openai_private_endpoint" {
-  source                         = "./modules/private_endpoint"
-  name                           = "${module.openai.name}PrivateEndpoint"
-  location                       = var.location
-  resource_group_name            = azurerm_resource_group.rg.name
-  subnet_id                      = module.virtual_network.subnet_ids[var.vm_subnet_name]
-  tags                           = var.tags
-  private_connection_resource_id = module.openai.id
-  is_manual_connection           = false
-  subresource_name               = "account"
-  private_dns_zone_group_name    = "AcrPrivateDnsZoneGroup"
-  private_dns_zone_group_ids     = [module.acr_private_dns_zone.id]
-}
-```
 
 Below you can read the code of the `private_dns_zone` and `private_endpoint` modules used, respectively, to create the [Azure Private Endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) and [Azure Private DNDS Zones](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone).
 
@@ -1405,223 +1654,6 @@ Two different authentication methods in the `magic8ball` chatbot application:
 
 - `Azure Active Directory`: set the `AZURE_OPENAI_TYPE` environment variable to `azure_ad` and use a service principal or managed identity with the [DefaultAzureCredential](https://learn.microsoft.com/en-us/python/api/azure-identity/azure.identity.defaultazurecredential?view=azure-python) object to acquire a security token from Azure Active Directory. For more information on the DefaultAzureCredential in Python, see [Authenticate Python apps to Azure services by using the Azure SDK for Python](https://docs.microsoft.com/en-us/azure/developer/python/azure-sdk-authenticate?tabs=cmd). Make sure to assign the `Cognitive Services User` role to the service principal or managed identity used to authenticate to your Azure OpenAI Service. For more information, see [How to configure Azure OpenAI Service with managed identities](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/how-to/managed-identity). If you want to use Azure AD integrated security, you need to create a custom subdomain for your Azure OpenAI resource and use the specific endpoint containing the custom domain, such as [https://myopenai.openai.azure.com/](https://myopenai.openai.azure.com/) where myopenai is the custom subdomain. If you specify the regional endpoint, you get an error like the following: `Subdomain does not map to a resource`. Hence, pass the custom domain endpoint in the `AZURE_OPENAI_BASE` environment variable. In this case, you also need to refresh the security token periodically.
 
-## Build the container image
-
-You can build the container image using the `Dockerfile` and `01-build-docker-image.sh` in the `scripts` folder.
-
-**Dockefile**
-
-```bash
-# app/Dockerfile
-
-# # Stage 1 - Install build dependencies
-
-# A Dockerfile must start with a FROM instruction which sets the base image for the container.
-# The Python images come in many flavors, each designed for a specific use case.
-# The python:3.11-slim image is a good base image for most applications.
-# It is a minimal image built on top of Debian Linux and includes only the necessary packages to run Python.
-# The slim image is a good choice because it is small and contains only the packages needed to run Python.
-# For more information, see: 
-# * https://hub.docker.com/_/python 
-# * https://docs.streamlit.io/knowledge-base/tutorials/deploy/docker
-FROM python:3.11-slim AS builder
-
-# The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile.
-# If the WORKDIR doesn’t exist, it will be created even if it’s not used in any subsequent Dockerfile instruction.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#workdir
-WORKDIR /app
-
-# Set environment variables. 
-# The ENV instruction sets the environment variable <key> to the value <value>.
-# This value will be in the environment of all “descendant” Dockerfile commands and can be replaced inline in many as well.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#env
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Install git so that we can clone the app code from a remote repo using the RUN instruction.
-# The RUN comand has 2 forms:
-# * RUN <command> (shell form, the command is run in a shell, which by default is /bin/sh -c on Linux or cmd /S /C on Windows)
-# * RUN ["executable", "param1", "param2"] (exec form)
-# The RUN instruction will execute any commands in a new layer on top of the current image and commit the results. 
-# The resulting committed image will be used for the next step in the Dockerfile.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#run
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    software-properties-common \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create a virtualenv to keep dependencies together
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Clone the requirements.txt which contains dependencies to WORKDIR
-# COPY has two forms:
-# * COPY <src> <dest> (this copies the files from the local machine to the container's own filesystem)
-# * COPY ["<src>",... "<dest>"] (this form is required for paths containing whitespace)
-# For more information, see: https://docs.docker.com/engine/reference/builder/#copy
-COPY requirements.txt .
-
-# Install the Python dependencies
-RUN pip install --no-cache-dir --no-deps -r requirements.txt
-
-# Stage 2 - Copy only necessary files to the runner stage
-
-# The FROM instruction initializes a new build stage for the application
-FROM python:3.11-slim
-
-# Sets the working directory to /app
-WORKDIR /app
-
-# Copy the virtual environment from the builder stage
-COPY --from=builder /opt/venv /opt/venv
-
-# Set environment variables
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Clone the app.py containing the application code
-COPY app.py .
-
-# Copy the images folder to WORKDIR
-# The ADD instruction copies new files, directories or remote file URLs from <src> and adds them to the filesystem of the image at the path <dest>.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#add
-ADD images ./images
-
-# The EXPOSE instruction informs Docker that the container listens on the specified network ports at runtime.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#expose
-EXPOSE 8501
-
-# The HEALTHCHECK instruction has two forms:
-# * HEALTHCHECK [OPTIONS] CMD command (check container health by running a command inside the container)
-# * HEALTHCHECK NONE (disable any healthcheck inherited from the base image)
-# The HEALTHCHECK instruction tells Docker how to test a container to check that it is still working. 
-# This can detect cases such as a web server that is stuck in an infinite loop and unable to handle new connections, 
-# even though the server process is still running. For more information, see: https://docs.docker.com/engine/reference/builder/#healthcheck
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
-
-# The ENTRYPOINT instruction has two forms:
-# * ENTRYPOINT ["executable", "param1", "param2"] (exec form, preferred)
-# * ENTRYPOINT command param1 param2 (shell form)
-# The ENTRYPOINT instruction allows you to configure a container that will run as an executable.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#entrypoint
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
-```
-
-**01-build-docker-image.sh
-
-```bash
-#!/bin/bash
-
-# Variables
-source ./00-variables.sh
-
-# Build the docker image
-docker build -t $imageName:$tag -f Dockerfile .
-```
-
-Before running any script, make sure to customize the value of the variables inside the `00-variables.sh` file. This file is embedded in all the scripts and contains the following variables:
-
-```bash
-# Variables
-acrName="CoralAcr"
-acrResourceGrougName="CoralRG"
-location="FranceCentral"
-attachAcr=false
-imageName="magic8ball"
-tag="v2"
-containerName="magic8ball"
-image="$acrName.azurecr.io/$imageName:$tag"
-imagePullPolicy="IfNotPresent" # Always, Never, IfNotPresent
-managedIdentityName="OpenAiManagedIdentity"
-federatedIdentityName="Magic8BallFederatedIdentity"
-
-# Azure Subscription and Tenant
-subscriptionId=$(az account show --query id --output tsv)
-subscriptionName=$(az account show --query name --output tsv)
-tenantId=$(az account show --query tenantId --output tsv)
-
-# Parameters
-title="Magic 8 Ball"
-label="Pose your question and cross your fingers!"
-temperature="0.9"
-imageWidth="80"
-
-# OpenAI
-openAiName="CoralOpenAi "
-openAiResourceGroupName="CoralRG"
-openAiType="azure_ad"
-openAiBase="https://coralopenai.openai.azure.com/"
-openAiModel="gpt-35-turbo"
-openAiDeployment="gpt-35-turbo"
-
-# Nginx Ingress Controller
-nginxNamespace="ingress-basic"
-nginxRepoName="ingress-nginx"
-nginxRepoUrl="https://kubernetes.github.io/ingress-nginx"
-nginxChartName="ingress-nginx"
-nginxReleaseName="nginx-ingress"
-nginxReplicaCount=3
-
-# Certificate Manager
-cmNamespace="cert-manager"
-cmRepoName="jetstack"
-cmRepoUrl="https://charts.jetstack.io"
-cmChartName="cert-manager"
-cmReleaseName="cert-manager"
-
-# Cluster Issuer
-email="paolos@microsoft.com"
-clusterIssuerName="letsencrypt-nginx"
-clusterIssuerTemplate="cluster-issuer.yml"
-
-# AKS Cluster
-aksClusterName="CoralAks"
-aksResourceGroupName="CoralRG"
-
-# Sample Application
-namespace="magic8ball"
-serviceAccountName="magic8ball-sa"
-deploymentTemplate="deployment.yml"
-serviceTemplate="service.yml"
-configMapTemplate="configMap.yml"
-secretTemplate="secret.yml"
-
-# Ingress and DNS
-ingressTemplate="ingress.yml"
-ingressName="magic8ball-ingress"
-dnsZoneName="contoso.com"
-dnsZoneResourceGroupName="DnsResourceGroup"
-subdomain="magic8ball"
-host="$subdomain.$dnsZoneName"
-```
-
-<hr />
-
-### Upload Docker container image to Azure Container Registry (ACR)
-
-You can push the Docker container image to Azure Container Registry (ACR) using the `03-push-docker-image.sh` script in the `scripts` folder.
-
-**03-push-docker-image.sh**
-
-```bash
-#!/bin/bash
-
-# Variables
-source ./00-variables.sh
-
-# Login to ACR
-az acr login --name $acrName 
-
-# Retrieve ACR login server. Each container image needs to be tagged with the loginServer name of the registry. 
-loginServer=$(az acr show --name $acrName --query loginServer --output tsv)
-
-# Tag the local image with the loginServer of ACR
-docker tag ${imageName,,}:$tag $loginServer/${imageName,,}:$tag
-
-# Push latest container image to ACR
-docker push $loginServer/${imageName,,}:$tag
-```
 
 <hr />
 
