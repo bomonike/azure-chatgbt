@@ -1,6 +1,6 @@
 Create a C#-based chatbot calling OpenAI Chainlit REST/gPRC APIs from within Azure resources created using Terraform: Entra, Key Vault, NGNIX, NAT Gateway, public &amp; private endpoints, Container Registry, Azure Kubernetes Service (AKS), Prometheus, Grafana.
 
-## Let's build it
+## Let's build this
 
 Here are the steps to make this happen:
 
@@ -12,6 +12,7 @@ Here are the steps to make this happen:
    1. <a href="#ChromaDB">ChromaDB</a>
    1. <a href="#Other-Vector-Databases">Other Vector Databases</a>
    <br /><br />
+1. <a href="#Fabric-Data+to-Vector-store">Fabric Data to Vector store</a>
 
 1. <a href="#Install-Prerequisite-Utilities">Install Perequisite Utilities</a>
 1. <a href="#Download">Download from GitHub</a>
@@ -20,7 +21,6 @@ Here are the steps to make this happen:
 1. <a href="#GitHub-Workflow-actions">GitHub Workflow Actions</a>
 1. <a href="#Build-Custom-Docker-Containers-into-ACR">Build Custom Docker Containers into ACR</a>
 
-1. <a href="#Fabric-Data+to-Vector-database">Fabric Data to Vector database</a>
 1. <a href="#Kubernetes-Components">Kubernetes Components</a>
 
 1. <a href="#Terraform-Providers">Terraform Providers</a>
@@ -60,13 +60,15 @@ A. The "front-end" <strong>Chat app</strong> is used by humans to interact with 
 
 B. The <strong>Docs app</strong> ???
 
+<hr />
+
 ### Python
 
-Both apps are written in Python and run within a <strong>Docker Container</strong> orchestrated as a pod within the <a href="Kubernetes">Kubernetes container orchestrator</a>.
+1. Both apps are written in Python and run within a <strong>Docker Container</strong> orchestrated as a pod within the <a href="Kubernetes">Kubernetes container orchestrator</a>.
 
-Both apps make API calls to two AI (Artificial Intelligence) services pretending to be human:
+   Both apps make API calls to two AI (Artificial Intelligence) services pretending to be human:
 
-### OpenAI Service
+   ### OpenAI Service
 
 1. The [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) uses the "ChatGPT-3.5" version of OpenAI's LLM (Large Language Model) that became famous in 2023 for its ability to <strong>generate</strong> new content based on existing content. LLMs also enable [content summarization](https://www.zdnet.com/article/how-to-use-chatgpt-to-summarize-a-book-article-or-research-paper/), semantic search, and natural language to code translation. Users can access the service through REST APIs, Python SDK, or  the web-based interface in the Azure OpenAI Studio.
 
@@ -91,6 +93,14 @@ Both apps make API calls to two AI (Artificial Intelligence) services pretending
    Prompt construction can be difficult. In practice, the prompt acts to configure the model weights to complete the desired task, but it's more of an art than a science, often requiring experience and intuition to craft a successful prompt. The goal of this article is to help get you started with this learning process. It attempts to capture general concepts and patterns that apply to all GPT models. However it's important to understand that each model behaves differently, so the learnings may not apply equally to all models.
 
    Prompt engineering refers to the process of creating instructions called prompts for Large Language Models (LLMs), such as OpenAI’s ChatGPT. With the immense potential of LLMs to solve a wide range of tasks, leveraging prompt engineering can empower us to save significant time and facilitate the development of impressive applications. It holds the key to unleashing the full capabilities of these huge models, transforming how we interact and benefit from them. For more information, see [Prompt engineering techniques](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/advanced-prompt-engineering?pivots=programming-language-chat-completions).
+
+   For more about the Azure OpenAI Service and Large Language Models (LLMs), see:
+
+   - [What is Azure OpenAI Service?](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview)
+   - [Azure OpenAI Service models](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models)
+   - [Large Language Model](https://en.wikipedia.org/wiki/Large_language_model)
+   <br /><br />
+
 
    ### Chainlit
 
@@ -135,19 +145,10 @@ Both apps make API calls to two AI (Artificial Intelligence) services pretending
 
    [ChromaDB](https://docs.trychroma.com/) stores and retrieves <strong>vector embeddings</strong> to add private data to LLMs. It is commonly used in AI applications, including chatbots and document analysis systems. By storing embeddings in ChromaDB, users can easily search and retrieve similar vectors, enabling faster and more accurate matching or recommendation processes. ChromaDB offers excellent scalability high performance, and supports various indexing techniques to optimize search operations. It is a versatile tool that enhances the functionality and efficiency of AI applications that rely on vector embeddings.<hr />
 
-For more information on the Azure OpenAI Service and Large Language Models (LLMs), see:
-
-   - [What is Azure OpenAI Service?](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview)
-   - [Azure OpenAI Service models](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models)
-   - [Large Language Model](https://en.wikipedia.org/wiki/Large_language_model)
-   - [Azure OpenAI Terraform deployment for sample chatbot](https://github.com/Azure-Samples/azure-openai-terraform-deployment-sample/)
-   - [Terraform module for deploying Azure OpenAI Service.](https://registry.terraform.io/modules/Azure/openai/azurerm/latest)
-   <br /><br />
-
 
 ### Other Vector Databases
 
-- [Facebook AI Similarity Search (FAISS)](https://faiss.ai/index.html) is another widely used vector database. Facebook AI Research develops it and offers highly optimized algorithms for similarity search and clustering of vector embeddings. FAISS is known for its speed and scalability, making it suitable for large-scale applications. It offers different indexing methods like flat, IVF (Inverted File System), and HNSW (Hierarchical Navigable Small World) to organize and search vector data efficiently.
+- [Facebook AI Similarity Search (FAISS)](https://faiss.ai/index.html) is a widely used vector database because Facebook AI Research develops it and offers highly optimized algorithms for similarity search and clustering of vector embeddings. FAISS is known for its speed and scalability, making it suitable for large-scale applications. It offers different indexing methods like flat, IVF (Inverted File System), and HNSW (Hierarchical Navigable Small World) to organize and search vector data efficiently.
 
 - [SingleStore](https://www.singlestore.com/): SingleStore aims to deliver the world’s fastest distributed SQL database for data-intensive applications: SingleStoreDB, which combines transactional + analytical workloads in a single platform.
 
@@ -171,6 +172,27 @@ NOTE: The apps here are not voice-enabled such as Amazon Alexa, Apple Siri, etc.
    * Speech-to-Text 
    * Text to Speech
    <br /><br />
+
+
+
+<hr />
+
+## Fabric Data to Vector store
+
+TODO: Extract Finance, Customer, Telemetry, or Semantic KPIs data stored in <a target="_blank" href="https://wilsonmar.github.io/microsoft-fabric/">Microsoft Fabric</a> OneLake to load as additional <strong>embeddings</strong> in the ChromaDB vector store to influence formulation of responses by OpenAI.
+
+We are aiming for converational search that makes use of Real-Time Telemetry data from Microsoft Fabric.
+
+We add custom vector embeddings so that the Chat can answer questions about telemetry statistics compared against    SLIs (Service Level Indicators) - the real numbers that indicate actual performance:
+
+   * SLAs (Sevice Level Agreements) - the agreements made with clients or users
+
+   * SLOs (Service Level Objectives) - the objectives that must be achieved to meet the SLA
+
+For more about this topic:
+   * https://www.datacamp.com/tutorial/chromadb-tutorial-step-by-step-guide
+   <br /><br />
+
 
 <hr />
 
@@ -490,14 +512,6 @@ docker build -t $imageName:$tag -f Dockerfile .
 
 <hr />
 
-## Fabric Data to Vector database
-
-At time of writing, components need to be added to store in <a target="_blank" href="https://wilsonmar.github.io/microsoft-fabric/">Microsoft Fabric</a> OneLake and reference the Finance, Customer, Telemetry, or Semantic KPIs in the vector database for access by our app.
-
-
-
-<hr />
-
 ## Kubernetes Components
 
 Each cluster contains the following Docker containers and Kubernetes services:
@@ -538,7 +552,10 @@ The [Azure Deployment Script <tt><strong>resource_deployment_script_azure_cli</s
 
 The [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) can be used to configure infrastructure in [Microsoft Azure](https://azure.microsoft.com/en-us/) using the Azure Resource Manager (ARM) API's. For more information on the [data sources](https://www.terraform.io/docs/configuration/data-sources.html) and [resources](https://www.terraform.io/docs/configuration/resources.html) supported by the Azure Provider, see the [documentation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs). To learn the basics of Terraform using this provider, follow the hands-on [get started tutorials](https://learn.hashicorp.com/tutorials/terraform/infrastructure-as-code?in=terraform/azure-get-started). If you are interested in the [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)'s latest features, see the [changelog](https://github.com/hashicorp/terraform-provider-azurerm/blob/main/CHANGELOG.md) for version information and release notes.
 
-
+For more about Terraform:
+   - [Azure OpenAI Terraform deployment for sample chatbot](https://github.com/Azure-Samples/azure-openai-terraform-deployment-sample/)
+   - [Terraform module for deploying Azure OpenAI Service.](https://registry.terraform.io/modules/Azure/openai/azurerm/latest)
+   <br /><br /> 
 
 <hr />
 
