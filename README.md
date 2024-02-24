@@ -7,6 +7,8 @@ Commentary about the technology used is presented to explain the configurations:
 1. <a href="#Download">Download from GitHub</a>
 1. <a href="#About+This+Repo">About This Repo</a>
 1. <a href="#Configure+Custom+Values">Configure Custom Values</a>
+   1. <a href="#00-variables.sh">00-variables.sh</a>
+   1. <a href="#Domain">Domain</a>
 
 1. <a href="#The-ChatGPT-Applications">The ChatGPT Applications</a>
    1. <a href="#OpenAI+LLM+Service">OpenAI LLM Service</a>
@@ -38,7 +40,7 @@ Commentary about the technology used is presented to explain the configurations:
 1. <a href="#Clean+up+resources">Clean up resources</a>
 <br /><br />
 
-
+<hr />
 
 ## Install Perequisite Utilities
 
@@ -64,7 +66,7 @@ Install these utilities, perhaps in one run of my <a target="https://wilsonmar.g
 
    <pre><strong>az login</strong></pre>
 
-1. Install <tt>az-preview</tt> extensions of version 0.5.140 or later
+1. Install <tt>az-preview</tt> extensions of version 0.5.140 or later (such as 1.0.0b6):
 
    <pre><strong>az extension add --name aks-preview --allow-preview true</strong></pre>
 
@@ -76,13 +78,15 @@ The installed extension 'aks-preview' is in preview.
 
    Later, to update to the latest version of the extension released:
 
-   <pre>az extension update --name aks-preview</pre>
+   <pre>az extension update --name aks-preview --allow-preview true</pre>
 
 1. The deployment must be started by a user who has sufficient permissions to assign roles, such as a `User Access Administrator` or `Owner`.
 
 1. Assign Azure account `Microsoft.Resources/deployments/write` permissions at the subscription level.
 
+1. Obtain a domain name.
 
+1. Obtain/specify email addresses.
 
 <hr />
 
@@ -102,9 +106,7 @@ The installed extension 'aks-preview' is in preview.
 
 ## About This Repo
 
-ATTIBUTION: This repo is adapted from Paolo's <a target="_blank" href="https://github.com/paolosalvatori/aks-openai-chainlit-terraform/">github</a> as referenced <a target="_blank" href="https://techcommunity.microsoft.com/t5/fasttrack-for-azure/create-an-azure-openai-langchain-chromadb-and-chainlit-chat-app/ba-p/4024070createdJan8-2024">in his blog</a>.
-
-NOTE: GitHub was designed to house text, not images. Images are retrieved from a cloudinary.com account so image sizing can be done dynamically adjusted for different screen sizes.
+NOTE: GitHub was designed to house text, not images. So images referenced in this README are retrieved from a cloudinary.com account so image sizing can be done dynamically adjusted for different screen sizes.
 
 The standard files: 
 
@@ -125,7 +127,7 @@ The two folders in this repo:
 *	<tt>scripts/.vscode</tt> to hold yml files to configure Kubernetes
 *	<tt>terraform</tt> to hold IaC (Infrastructure as Code) to automate creation of resources
 
-
+ATTIBUTION: This repo is adapted from Paolo's <a target="_blank" href="https://github.com/paolosalvatori/aks-openai-chainlit-terraform/">github</a> as referenced <a target="_blank" href="https://techcommunity.microsoft.com/t5/fasttrack-for-azure/create-an-azure-openai-langchain-chromadb-and-chainlit-chat-app/ba-p/4024070createdJan8-2024">in his blog</a>.
 
 <hr />
 
@@ -146,6 +148,122 @@ VIEW: 09-deploy-apps.sh</a>
 
 * <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/10-configure-dns.sh">
 VIEW: 10-configure-dns.sh</a> 
+
+
+<hr />
+
+## Customize Variable Values
+
+### 00-variables.sh
+
+1. Open a Text Editor (such as Visual Studio Code) to edit the file embedded in all scripts to consistently provide values to system variables referenced:
+
+   <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/00-variables.sh">
+   VIEW 00-variables.sh</a>
+
+   1. # Azure Subscription and Tenant
+   1. # Variables
+      acrName="PaolosAcr"
+      acrResourceGrougName="PaolosRG"
+      location="eastus"
+   1. # Python Files
+   1. # Docker images
+   1. # Arrays
+   1. # OpenAI
+   1. # Certificate Manager
+   1. # Cluster Issuer
+   1. # AKS Cluster
+   1. # App Parameters
+   1. # Ingress and DNS
+   1. # Nginx Ingress Controller
+   1. # NGINX
+   1. # Sample Application
+   <br /><br />
+
+## What This Repo Does
+
+This repo runs from an macOS on Apple MacBook.
+
+
+
+
+1. Customize the value of each variable: 
+
+   ```bash
+# Variables
+acrName="CoralAcr"
+acrResourceGrougName="CoralRG"
+location="FranceCentral"
+attachAcr=false
+imageName="magic8ball"
+tag="v2"
+containerName="magic8ball"
+image="$acrName.azurecr.io/$imageName:$tag"
+imagePullPolicy="IfNotPresent" # Always, Never, IfNotPresent
+managedIdentityName="OpenAiManagedIdentity"
+federatedIdentityName="Magic8BallFederatedIdentity"
+
+# Azure Subscription and Tenant
+subscriptionId=$(az account show --query id --output tsv)
+subscriptionName=$(az account show --query name --output tsv)
+tenantId=$(az account show --query tenantId --output tsv)
+
+# Parameters
+title="Magic 8 Ball"
+label="Pose your question and cross your fingers!"
+temperature="0.9"
+imageWidth="80"
+
+# OpenAI
+openAiName="CoralOpenAi "
+openAiResourceGroupName="CoralRG"
+openAiType="azure_ad"
+openAiBase="https://coralopenai.openai.azure.com/"
+openAiModel="gpt-35-turbo"
+openAiDeployment="gpt-35-turbo"
+
+# Nginx Ingress Controller
+nginxNamespace="ingress-basic"
+nginxRepoName="ingress-nginx"
+nginxRepoUrl="https://kubernetes.github.io/ingress-nginx"
+nginxChartName="ingress-nginx"
+nginxReleaseName="nginx-ingress"
+nginxReplicaCount=3
+
+# Certificate Manager
+cmNamespace="cert-manager"
+cmRepoName="jetstack"
+cmRepoUrl="https://charts.jetstack.io"
+cmChartName="cert-manager"
+cmReleaseName="cert-manager"
+
+# Cluster Issuer
+email="paolos@microsoft.com"
+clusterIssuerName="letsencrypt-nginx"
+clusterIssuerTemplate="cluster-issuer.yml"
+
+# AKS Cluster
+aksClusterName="CoralAks"
+aksResourceGroupName="CoralRG"
+
+# Sample Application
+namespace="magic8ball"
+serviceAccountName="magic8ball-sa"
+deploymentTemplate="deployment.yml"
+serviceTemplate="service.yml"
+configMapTemplate="configMap.yml"
+secretTemplate="secret.yml"
+
+# Ingress and DNS
+ingressTemplate="ingress.yml"
+ingressName="magic8ball-ingress"
+dnsZoneName="contoso.com"
+dnsZoneResourceGroupName="DnsResourceGroup"
+subdomain="magic8ball"
+host="$subdomain.$dnsZoneName"
+   ```
+
+1. TODO: "${RESC_GROUP_NAME}"
 
 
 <hr />
@@ -337,93 +455,6 @@ TODO: In the <tt>.github/workflow</tt> folder are GitHub Actions yaml files that
 1. TODO: Run <a target="_blank" href="https://github.com/marketplace/actions/gitguardian-shield-action">Git Guardian</a>
 
 1. TODO: Add a step to <a target="_blank" href="https://github.com/marketplace/actions/todo-to-issue">convert TODO comments in code to GitHub Issues.
-
-
-<hr />
-
-## Customize Variable Values
-
-1. Open a Text Editor (such as Visual Studio Code) to edit the file embedded in all scripts to consistently provide values to system variables referenced:
-
-   <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/00-variables.sh">00-variables.sh</a>
-
-1. Customize the value of each variable: 
-
-   ```bash
-# Variables
-acrName="CoralAcr"
-acrResourceGrougName="CoralRG"
-location="FranceCentral"
-attachAcr=false
-imageName="magic8ball"
-tag="v2"
-containerName="magic8ball"
-image="$acrName.azurecr.io/$imageName:$tag"
-imagePullPolicy="IfNotPresent" # Always, Never, IfNotPresent
-managedIdentityName="OpenAiManagedIdentity"
-federatedIdentityName="Magic8BallFederatedIdentity"
-
-# Azure Subscription and Tenant
-subscriptionId=$(az account show --query id --output tsv)
-subscriptionName=$(az account show --query name --output tsv)
-tenantId=$(az account show --query tenantId --output tsv)
-
-# Parameters
-title="Magic 8 Ball"
-label="Pose your question and cross your fingers!"
-temperature="0.9"
-imageWidth="80"
-
-# OpenAI
-openAiName="CoralOpenAi "
-openAiResourceGroupName="CoralRG"
-openAiType="azure_ad"
-openAiBase="https://coralopenai.openai.azure.com/"
-openAiModel="gpt-35-turbo"
-openAiDeployment="gpt-35-turbo"
-
-# Nginx Ingress Controller
-nginxNamespace="ingress-basic"
-nginxRepoName="ingress-nginx"
-nginxRepoUrl="https://kubernetes.github.io/ingress-nginx"
-nginxChartName="ingress-nginx"
-nginxReleaseName="nginx-ingress"
-nginxReplicaCount=3
-
-# Certificate Manager
-cmNamespace="cert-manager"
-cmRepoName="jetstack"
-cmRepoUrl="https://charts.jetstack.io"
-cmChartName="cert-manager"
-cmReleaseName="cert-manager"
-
-# Cluster Issuer
-email="paolos@microsoft.com"
-clusterIssuerName="letsencrypt-nginx"
-clusterIssuerTemplate="cluster-issuer.yml"
-
-# AKS Cluster
-aksClusterName="CoralAks"
-aksResourceGroupName="CoralRG"
-
-# Sample Application
-namespace="magic8ball"
-serviceAccountName="magic8ball-sa"
-deploymentTemplate="deployment.yml"
-serviceTemplate="service.yml"
-configMapTemplate="configMap.yml"
-secretTemplate="secret.yml"
-
-# Ingress and DNS
-ingressTemplate="ingress.yml"
-ingressName="magic8ball-ingress"
-dnsZoneName="contoso.com"
-dnsZoneResourceGroupName="DnsResourceGroup"
-subdomain="magic8ball"
-host="$subdomain.$dnsZoneName"
-   ```
-
-1. TODO: "${RESC_GROUP_NAME}"
 
 
 
