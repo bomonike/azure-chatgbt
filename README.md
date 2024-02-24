@@ -1,6 +1,12 @@
 Create a Python-based chatbot calling OpenAI Chainlit REST/gPRC APIs from within Azure resources created using Terraform: Entra, Key Vault, NGNIX, NAT Gateway, public &amp; private endpoints, Container Registry, Azure Kubernetes Service (AKS), Prometheus, Grafana.
 
-Here are the steps to make this happen:
+Below is an index to the steps to make this happen.
+Commentary about the technology used is presented to explain the configurations:
+
+1. <a href="#Install+Prerequisite+Utilities">Install Perequisite Utilities</a>
+1. <a href="#Download">Download from GitHub</a>
+1. <a href="#About+This+Repo">About This Repo</a>
+1. <a href="#Configure+Custom+Values">Configure Custom Values</a>
 
 1. <a href="#The-ChatGPT-Applications">The ChatGPT Applications</a>
    1. <a href="#OpenAI+LLM+Service">OpenAI LLM Service</a>
@@ -11,10 +17,6 @@ Here are the steps to make this happen:
    1. <a href="#Other+Vector+Databases">Other Vector Databases</a>
    <br /><br />
 1. <a href="#Fabric-Data+to-Vector-store">Fabric Data to Vector store</a>
-
-1. <a href="#Install+Prerequisite+Utilities">Install Perequisite Utilities</a>
-1. <a href="#Download">Download from GitHub</a>
-1. <a href="#Configure+Custom+Values">Configure Custom Values</a>
 
 1. <a href="#GitHub+Workflow+actions">GitHub Workflow Actions</a>
 1. <a href="#Build+Custom+Docker+Conatainers+into+ACR">Build Custom Docker Containers into ACR</a>
@@ -36,23 +38,113 @@ Here are the steps to make this happen:
 1. <a href="#Clean+up+resources">Clean up resources</a>
 <br /><br />
 
+
+
+## Install Perequisite Utilities
+
+Install these utilities, perhaps in one run of my <a target="https://wilsonmar.github.io/mac-setup/">mac-setup.zsh</a>:
+
+1. macOS command-line (xcode-install)
+1. Ruby, Homebrew
+1. <tt>brew install --cask vscode</tt>
+   * [Visual Studio Code](https://code.visualstudio.com/) installed on one of the [supported platforms](https://code.visualstudio.com/docs/supporting/requirements#_platforms) along with the [HashiCorp Terraform](https://marketplace.visualstudio.com/items?itemName=HashiCorp.terraform).
+   <br /><br />
+1. brew install jq, git, python, miniconda, ai cli, terraform, curl, .net, prometheus, grafana
+   * [Terraform v1.5.2 or later](https://developer.hashicorp.com/terraform/downloads).
+   <br /><br />
+1. <tt>brew install azurecli</tt>
+   * Install Azure CLI version 2.49.0 or later installed. To install or upgrade, see [Install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
+   <br /><br />
+   To verify the azcli version:<br />
+   <tt>az --version</tt>
+
+1. An active [Azure subscription](https://docs.microsoft.com/en-us/azure/guides/developer/azure-developer-guide#understanding-accounts-subscriptions-and-billing). If you don't have one, create a [free Azure account](https://azure.microsoft.com/free/) before you begin.
+
+1. Test login into Azure:
+
+   <pre><strong>az login</strong></pre>
+
+1. Install <tt>az-preview</tt> extensions of version 0.5.140 or later
+
+   <pre><strong>az extension add --name aks-preview --allow-preview true</strong></pre>
+
+   PROTIP: At time of writing, "No suitable stable version of 'aks-preview' to install. Add `--allow-preview` to try preview versions". So if that's not specified:
+
+   <pre>Default enabled including preview versions for extension installation now. Disabled in May 2024. Use '--allow-preview true' to enable it specifically if needed. Use '--allow-preview false' to install stable version only.
+The installed extension 'aks-preview' is in preview.
+   </pre>
+
+   Later, to update to the latest version of the extension released:
+
+   <pre>az extension update --name aks-preview</pre>
+
+1. The deployment must be started by a user who has sufficient permissions to assign roles, such as a `User Access Administrator` or `Owner`.
+
+1. Assign Azure account `Microsoft.Resources/deployments/write` permissions at the subscription level.
+
+
+
 <hr />
+
+## Download from GitHub
+
+1. Navigate to the folder where you want to create a repository from GitHub.com.
+
+   PROTIP: Our team uses the <tt>bomonike</tt> GitHub organization, which is why that name is part of the URL. That folder is at the root so we have a separate account ssh and gpg for it.
+
+2. Download without credentials:
+
+   <pre><strong>git clone https://github.com/bomonike/azure-chatgbt.git</strong></pre>
+
+   CAUTION: If that repository is not found (being private), please connect with me at<br />
+   <a target="_blank" href="https://linkedin.com/in/wilsonmar">https://linkedin.com/in/wilsonmar</a>
+
+
+## About This Repo
+
+ATTIBUTION: This repo is adapted from Paolo's <a target="_blank" href="https://github.com/paolosalvatori/aks-openai-chainlit-terraform/">github</a> as referenced <a target="_blank" href="https://techcommunity.microsoft.com/t5/fasttrack-for-azure/create-an-azure-openai-langchain-chromadb-and-chainlit-chat-app/ba-p/4024070createdJan8-2024">in his blog</a>.
+
+NOTE: GitHub was designed to house text, not images. Images are retrieved from a cloudinary.com account so image sizing can be done dynamically adjusted for different screen sizes.
+
+The standard files: 
+
+   *	CHANGELOG.md
+   *	CODE_OF_CONDUCT.md
+   *	CONTRIBUTING.md
+   *	LICENSE.md
+   *	README.md
+   *	README1.md
+   *	robot.png
+   <br /><br />
+
+The two folders in this repo:
+
+* <a href="#GitHub+Workflow+Actions>.github/workflow</strong></a> to hold GitHub Actions specifications
+*	<tt>scripts</tt> to hold shell (.sh) files
+*	<tt>scripts/.chainlit</tt> to hold 
+*	<tt>scripts/.vscode</tt> to hold yml files to configure Kubernetes
+*	<tt>terraform</tt> to hold IaC (Infrastructure as Code) to automate creation of resources
+
+
+
+<hr />
+
 
 WARNING: These are files in the script folder not yet documented in this article:
 
-x <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/02-run-docker-container.sh">
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/02-run-docker-container.sh">
 VIEW: 02-run-docker-container.sh</a> 
 
-x <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/03-push-docker-image.sh">
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/03-push-docker-image.sh">
 VIEW: 03-push-docker-image.sh</a> 
 
-x <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/06-create-cluster-issuers.sh">
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/06-create-cluster-issuers.sh">
 VIEW: 06-create-cluster-issuers.sh</a> 
 
-x <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/09-deploy-apps.sh">
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/09-deploy-apps.sh">
 VIEW: 09-deploy-apps.sh</a> 
 
-x <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/10-configure-dns.sh">
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/10-configure-dns.sh">
 VIEW: 10-configure-dns.sh</a> 
 
 
@@ -133,7 +225,7 @@ B. The <strong>Docs app</strong> ???
    - [Cookbook](https://docs.chainlit.io/examples/cookbook)
    <br /><br />
 
-   The "Docs Application" container setup and run by this repo additionally contains an instance of the LangChain and <a href="#ChromaDB">"ChromaDB"</a>  <a href="#Vector=Databases">Vector Database</a>.
+   The "Docs Application" container setup and run by this repo additionally contains an instance of the LangChain and <a href="#ChromaDB">"ChromaDB"</a>  <a href="#Vector+Databases">Vector Database</a>.
 
    ### LangChain
 
@@ -207,66 +299,6 @@ NOTE: The scope of apps here are not voice-enabled such as <a target="_blank" hr
 
 
 <hr />
-
-## Install Perequisite Utilities
-
-Install these utilities, perhaps in one run of my <a target="https://wilsonmar.github.io/mac-setup/">mac-setup.zsh</a>:
-
-1. macOS command-line (xcode-install)
-1. Ruby, Homebrew
-1. <tt>brew install --cask vscode</tt>
-   * [Visual Studio Code](https://code.visualstudio.com/) installed on one of the [supported platforms](https://code.visualstudio.com/docs/supporting/requirements#_platforms) along with the [HashiCorp Terraform](https://marketplace.visualstudio.com/items?itemName=HashiCorp.terraform).
-   <br /><br />
-1. brew install jq, git, python, miniconda, ai cli, terraform, curl, .net, prometheus, grafana
-   * [Terraform v1.5.2 or later](https://developer.hashicorp.com/terraform/downloads).
-   <br /><br />
-1. <tt>brew install azurecli</tt>
-   * Install Azure CLI version 2.49.0 or later installed. To install or upgrade, see [Install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
-   <br /><br />
-   To verify the azcli version:<br />
-   <tt>az --version</tt>
-
-1. An active [Azure subscription](https://docs.microsoft.com/en-us/azure/guides/developer/azure-developer-guide#understanding-accounts-subscriptions-and-billing). If you don't have one, create a [free Azure account](https://azure.microsoft.com/free/) before you begin.
-
-1. Test login into Azure:
-
-   <pre><strong>az login</strong></pre>
-
-1. Install <tt>az-preview</tt> extensions of version 0.5.140 or later
-
-   <pre><strong>az extension add --name aks-preview --allow-preview true</strong></pre>
-
-   PROTIP: At time of writing, "No suitable stable version of 'aks-preview' to install. Add `--allow-preview` to try preview versions". So if that's not specified:
-
-   <pre>Default enabled including preview versions for extension installation now. Disabled in May 2024. Use '--allow-preview true' to enable it specifically if needed. Use '--allow-preview false' to install stable version only.
-The installed extension 'aks-preview' is in preview.
-   </pre>
-
-   Later, to update to the latest version of the extension released:
-
-   <pre>az extension update --name aks-preview</pre>
-
-1. The deployment must be started by a user who has sufficient permissions to assign roles, such as a `User Access Administrator` or `Owner`.
-
-1. Assign Azure account `Microsoft.Resources/deployments/write` permissions at the subscription level.
-
-
-
-<hr />
-
-## Download from GitHub
-
-1. Navigate to the folder where you want to create a repository from GitHub.com.
-
-   PROTIP: Our team uses the <tt>bomonike</tt> GitHub organization, which is why that name is part of the URL.
-
-2. Download without credentials:
-
-   <pre><strong>git clone https://github.com/bomonike/azure-chatgbt.git</strong></pre>
-
-   CAUTION: If that repository is not found (being private), please connect with me at<br />
-   <a target="_blank" href="https://linkedin.com/in/wilsonmar">https://linkedin.com/in/wilsonmar</a>
-
 
 
 <hr />
