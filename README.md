@@ -1,7 +1,5 @@
 Create a Python-based chatbot calling OpenAI Chainlit REST/gPRC APIs from within Azure resources created using Terraform: Entra, Key Vault, NGNIX, NAT Gateway, public &amp; private endpoints, Container Registry, Azure Kubernetes Service (AKS), Prometheus, Grafana.
 
-## Let's build this
-
 Here are the steps to make this happen:
 
 1. <a href="#The-ChatGPT-Applications">The ChatGPT Applications</a>
@@ -19,7 +17,7 @@ Here are the steps to make this happen:
 1. <a href="#Configure-Custom-Values">Configure Custom Values</a>
 
 1. <a href="#GitHub-Workflow-actions">GitHub Workflow Actions</a>
-1. <a href="#Build-Custom-Docker-Containers-into-ACR">Build Custom Docker Containers into ACR</a>
+1. <a href="#Build-Custom-Docker-Conatainers-into-ACR">Build Custom Docker Containers into ACR</a>
 
 1. <a href="#Kubernetes-Components">Kubernetes Components</a>
 
@@ -38,15 +36,29 @@ Here are the steps to make this happen:
 1. <a href="#Clean-up-resources">Clean up resources</a>
 <br /><br />
 
+<hr />
+
+WARNING: These are files in the script folder not yet documented in this article:
+
+x <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/02-run-docker-container.sh">
+VIEW: 02-run-docker-container.sh</a> 
+
+x <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/03-push-docker-image.sh">
+VIEW: 03-push-docker-image.sh</a> 
+
+x <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/06-create-cluster-issuers.sh">
+VIEW: 06-create-cluster-issuers.sh</a> 
+
+x <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/09-deploy-apps.sh">
+VIEW: 09-deploy-apps.sh</a> 
+
+x <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/10-configure-dns.sh">
+VIEW: 10-configure-dns.sh</a> 
+
 
 <hr />
 
 ## The ChatGPT Applications 
-
-<!--
-The chatbot application simulates the original [Magic 8 Ball](https://en.wikipedia.org/wiki/Magic_8_Ball) plastic sphere, made to look like an oversized eight ball, that is used for fortune-telling or seeking advice.
-![Magic 8 Ball](/images/magic8ball.png)
--->
 
 End-users interact with a <strong>Chat application</strong> (on the "front-end") to hold conversations with users via interactive chat.
 
@@ -54,7 +66,7 @@ A traditional Chat app, such as the iMessage app on iPhones between people, has 
 
 Two applications are constructed by this repo:
 
-![Containers](images/containers.png)
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1708723967/openai/containers.png"><img alt="containers.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1708723967/openai/containers.png"></a>
  
 A. The "front-end" <strong>Chat app</strong> is used by humans to interact with a non-human "Docs Application".
 
@@ -265,20 +277,38 @@ The installed extension 'aks-preview' is in preview.
 
 ## GitHub Workflow Actions
 
-TODO: In the <tt>.github/workflow</tt> folder are GitHub Actions files that run shell (.sh) files in the <tt>scripts</tt> folder to automate build and deploy.
+<a target="_blank" href="https://www.youtube.com/watch?v=yfBtjLxn_6k">VIDEO</a>:
+<a target="_blank" href="https://www.youtube.com/watch?v=-hVG9z0fCac&list=PLArH6NjfKsUhvGHrpag7SuPumMzQRhUKY&pp=iAQB">VIDEO</a>:
+TODO: In the <tt>.github/workflow</tt> folder are GitHub Actions yaml files that define how to work.
 
    * install-packages-for-chainlin-demo.sh
    <br /><br />
 
-1. TODO: Add a step in the GitHub workflow to create a SBOM (Software Bill of Materials) by iteratively (exhaustively) following the chain of packages referenced in each program. This would add many more to the list of 138 in the file. This enables raising an alert if any package:
-   
-   * contains code that appears to have gibberish that might be a password, API key, or other secret;
-   * is not of the latest version ;
-   * has an open GitHub Dependabot alert; 
-   * has been found to have a vulnerability;
-   * contains code that can potentially be malicious actions such as exfiltration of data to a possible adversary (such as China, Russia, North Korea, Iran, etc.)
+   They are automatically invoked when a <tt>git commit</tt> is performed.
+
+   For more on this topic:
+   * https://github.com/actions
+   * https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/
+   * https://github.com/marketplace?category=&query=&type=actions&verification=
    <br /><br />
 
+1. TODO: Add a step in the GitHub workflow to create a SBOM (Software Bill of Materials) by iteratively (exhaustively) following the chain of packages referenced in each program. This would add many more to the list of 138 in the file. This enables raising an alert if any package:
+   
+   * is not of the latest version ;
+   * has an open <a target="_blank" href="https://github.com/marketplace/actions/dependency-review">GitHub Dependabot alert</a>; 
+   * has been found <a target="_blank" href="https://github.com/marketplace/actions/aqua-security-trivy">by Aqua Trivy</a> or <a target="_blank" href="https://github.com/marketplace/actions/snyk">Snyk</a> to have a vulnerability reported to CISA as a CVE;
+   * contains code that can potentially be malicious actions such as exfiltration of data to a possible adversary (such as China, Russia, North Korea, Iran, etc.)
+   * contains <a target="_blank" href="https://github.com/marketplace/actions/markdown-link-check">markdown text with broken links</a>
+   <br /><br />
+
+1. TODO: Use <a target="_blank" href="https://github.com/marketplace/actions/gitguardian-shield-action">Git Guardian</a> to highlight code that appears to have gibberish that might be a password, API key, or other secret;
+
+1. TODO: <a target="_blank" href="https://github.com/marketplace/actions/git-semantic-version">Determine the semantic version of a repo</a> based on git history.
+
+1. TODO: <a target="_blank" href="https://github.com/marketplace/actions/gh-release">Create a new release</a>
+1. TODO: Run <a target="_blank" href="https://github.com/marketplace/actions/gitguardian-shield-action">Git Guardian</a>
+
+1. TODO: Add a step to <a target="_blank" href="https://github.com/marketplace/actions/todo-to-issue">convert TODO comments in code to GitHub Issues.
 
 
 <hr />
@@ -496,9 +526,12 @@ ENV PATH="/opt/venv/bin:$PATH"
 1. QUESTION: <tt>ENTRYPOINT ["streamlit"</tt>
 
 
-### ../scripts/01-build-docker-image.sh
+### 01-build-docker-image.sh
 
 Run `01-build-docker-image.sh` in the `scripts` folder to build container images using the `Dockerfile` referencing various <tt>yaml</tt> files in the same folder:
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/01-build-docker-images.sh">
+VIEW: 01-build-docker-images.sh</a> 
 
    ```bash
 #!/bin/bash
@@ -516,28 +549,76 @@ docker build -t $imageName:$tag -f Dockerfile .
 
 Each cluster contains the following Docker containers and Kubernetes services:
 
-![Application Architecture](images/workload.png)
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1708723970/openai/workload.png"><img alt="workload.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1708723970/openai/workload.png"></a>
 
-All the above containers is represented by one of group of purple icons at the right side of the diagram above and at the <a href="#Infrastructure-Architecture-Diagram">Infrastructure Architecture Diagram (below)</a>.
+All the containers above are collectively represented by one of group of <strong>purple icons</strong> at the right side of the diagram above and at the <a href="#Infrastructure-Architecture-Diagram">Infrastructure Architecture Diagram (below)</a>.
 
-   * chat-configmap.yml
-   * chat-deployment.yml
-   * chat-ingress.yml
-   * chat-service.yml
+* <a target="_blank" href="#chat.py">chat.py</a> ?
+* <a target="_blank" href="#chat-configmap.yml">chat-configmap.yml</a>  ?
+* <a target="_blank" href="#chat-deployment.yml">chat-deployment.yml</a>
+* <a target="_blank" href="#chat-ingress.yml">chat-ingress.yml</a>  ?
+* <a target="_blank" href="#chat-service.yml">chat-service.yml</a>
 
-   * chat.py
+* <a target="_blank" href="#cluster-issuer-webapprouting.yml">cluster-issuer-webapprouting.yml</a> ?
+* <a target="_blank" href="#cluster-issuer-nginx.yml">cluster-issuer-nginx.yml</a> ?
 
-   * cluster-issuer-webapprouting.yml
-   * cluster-issuer-nginx.yml
+* <a target="_blank" href="#docs.py">docs.py</a> ?
+* <a target="_blank" href="#docs-configmap.yml">docs-configmap.yml</a> ?
+* <a target="_blank" href="#docs-deployment.yml">docs-deployment.yml</a>
+* <a target="_blank" href="#docs-ingress.yml">docs-ingress.yml</a> ?
+* <a target="_blank" href="#docs-service.yml">docs-service.yml</a> ?
 
-   * docs-configmap.yml
-   * docs-deployment.yml
-   * docs-ingress.yml
-   * docs-service.yml
+* <a target="_blank" href="#chainlit.md">chainlit.md</a>
+<br /><br />
 
-   * docs.py
-   * chainlit.md
+These
 
+<a name="chat.py"></a>
+
+### chat.py
+
+<a name="chat-configmap.yml"></a>
+
+### chat-configmap.yml</a> 
+
+<a name="chat-deployment.yml"></a>
+
+### chat-ingress.yml</a> 
+
+<a name="chat-service.yml"></a>
+
+<a name="cluster-issuer-webapprouting.yml"></a>
+
+### cluster-issuer-webapprouting.yml
+
+<a name="cluster-issuer-nginx.yml"></a>
+
+### cluster-issuer-nginx.yml
+
+
+<a name="docs.py"></a>
+
+### docs.py
+
+<a name="docs-configmap.yml"></a>
+
+### docs-configmap.yml
+
+<a name="docs-ingress.yml"></a>
+
+### docs-ingress.yml
+
+<a name="docs-service.yml"></a>
+
+### docs-service.yml
+
+
+<a name="chainlit.md"></a>
+
+### chainlit.md</a>
+
+
+<hr />
 
 <a name="Terraform-Providers"></a>
 
@@ -561,36 +642,32 @@ For more about Terraform:
 
 ## Terraform Modules
 
-Terraform (.tf modules to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). The following diagram shows the architecture and network topology deployed by the sample:
+Terraform (.tf modules to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). 
 
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/01-build-docker-images.sh">01-build-docker-images.sh</a> 
+* <a href="#01-build-docker-images.sh">01-build-docker-images.sh</a> 
+* <a href="#02-run-docker-container.sh">02-run-docker-container.sh</a> 
+* <a href="#03-push-docker-image.sh">03-push-docker-image.sh</a> ?
 
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/02-run-docker-container.sh">02-run-docker-container.sh</a> 
+* <a href="#04-create-nginx-ingress-controller.sh">04-create-nginx-ingress-controller.sh</a> 
+* <a href="#05-install-cert-manager.sh">05-install-cert-manager.sh</a>
 
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/03-push-docker-image.sh<">03-push-docker-image.sh</a> 
+* <a href="#06-create-cluster-issuers.sh">06-create-cluster-issuers.sh</a> ?
+* <a href="#07-create-workload-managed-identity.sh">07-create-workload-managed-identity.sh</a> 
 
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/04-create-nginx-ingress-controller.sh">04-create-nginx-ingress-controller.sh</a> 
+* <a href="#08-create-service-account.sh">08-create-service-account.sh</a> 
+* <a href="#09-deploy-apps.sh">09-deploy-apps.sh</a> ?
+* <a href="#10-configure-dns.sh">10-configure-dns.sh</a> ?
 
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/05-install-cert-manager.sh">05-install-cert-manager.sh</a> 
-
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/06-create-cluster-issuers.sh">06-create-cluster-issuers.sh</a> 
-
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/07-create-workload-managed-identity.sh">07-create-workload-managed-identity.sh</a> 
-
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/08-create-service-account.sh">08-create-service-account.sh</a> 
-
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/09-deploy-apps.sh<">09-deploy-apps.sh</a> 
-
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/10-configure-dns.sh">10-configure-dns.sh</a> 
-
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/install-packages-for-chainlit-demo.sh">install-packages-for-chainlit-demo.sh</a> 
-
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/install-packages-for-chainlit-demo.sh">install-packages-for-chainlit-demo.sh</a> 
+* <a href="#install-packages-for-chainlit-demo.sh">install-packages-for-chainlit-demo.sh</a> 
+<br /><br />
 
 
 <hr />
 
 ### 03-push-docker-image.sh
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/03-push-docker-image.sh">
+VIEW: 03-push-docker-image.sh</a> 
 
 ```bash
 #!/bin/bash
@@ -620,6 +697,7 @@ docker push $loginServer/${imageName,,}:$tag
 
 1. Let's encrypt creates free SSL/TLS certificate so websites can communicate using HTTPS (secure HTTP).
 
+<a target="_blank" href="https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-self-signed-certificate">Create a self-signed public certificate to authenticate your application</a>  Microsoft identity platform
 
 <hr />
 
@@ -667,6 +745,20 @@ The diagram above is based on Paolo's <a target="_blank" href="https://github.co
    - [BYO CNI](https://learn.microsoft.com/en-us/azure/aks/use-byo-cni?tabs=azure-cli)
    - [Kubenet](https://learn.microsoft.com/en-us/azure/aks/configure-kubenet)
    <br /><br />
+
+   ### IP addresses
+
+   As specified in the diagram:
+
+   * 10.0.0.2/8 = VNet
+   * 10.240.0.0/16 = SystemSubnet
+   * 10.241.0.0/16 = UserSubnet
+   * 10.242.0.0/16 = PodSubnet
+   * 10.243.0.0/27 = ApiServerSubnet
+   * 10.243.2.0/24 = AzureBastion
+   * 10.243.1.0/24 = VMSubnet
+   * 10.243.1.0/24 = PodSubnet
+   <br /><br  />
 
 1. [Azure Bastion Host](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/bastion_host): a separate Azure Bastion is deployed in the AKS cluster virtual network to provide SSH connectivity to both agent nodes and virtual machines.
 
@@ -1049,11 +1141,12 @@ For more information, see the following resources:
 
 Open the Azure Portal, and navigate to the resource group. Open the Azure Open AI Service resource, navigate to `Keys and Endpoint`, and check that the endpoint contains a custom subdomain rather than the regional Cognitive Services endpoint.
 
-![OpenAI Key and Endpoint](/images/openai.png)
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1708723968/openai/openai.png"><img alt="OpenAI Key and Endpoint" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1708723968/openai/openai.png"></a>
 
 Open to the `<Prefix>WorkloadManagedIdentity` managed identity, navigate to the `Federated credentials`, and verify that the federated identity credentials for the `magic8ball-sa` service account were created correctly, as shown in the following picture.
 
-![Federated Identity Credentials](/images/federatedidentitycredentials.png)
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1708723967/openai/federatedidentitycredentials.png"><img alt="Federated Identity Credentials" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1708723967/openai/federatedidentitycredentials.png"></a>
+
 
 ## Use Azure AD workload identity with Azure Kubernetes Service (AKS)
 
@@ -1808,9 +1901,12 @@ Alternately, to deploy the application in your AKS cluster, you can use the foll
 
 <hr />
 
-### ../scripts/04-create-nginx-ingress-controller.sh
+### 04-create-nginx-ingress-controller.sh
 
 This script installs the `NGINX Ingress Controller` using Helm.
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/04-create-nginx-ingress-controller.sh">
+VIEW: 04-create-nginx-ingress-controller.sh</a> 
 
 ```bash
 #!/bin/bash
@@ -1863,9 +1959,12 @@ SecRule REMOTE_ADDR "@ipMatch 127.0.0.1" "id:87,phase:1,pass,nolog,ctl:ruleEngin
 fi
 ```
 
-### ../scripts/05-install-cert-manager.sh
+### 05-install-cert-manager.sh
 
 This script installs the `cert-manager` using Helm.
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/05-install-cert-manager.sh">
+VIEW: 05-install-cert-manager.sh</a> 
 
 ```bash
 #/bin/bash
@@ -1930,9 +2029,12 @@ else
 fi
 ```
 
-### ../scripts/07-create-workload-managed-identity.sh
+### 07-create-workload-managed-identity.sh
 
 This script creates the managed identity used by the `magic8ball`chatbot and assigns it the `Cognitive Services User` role on the Azure OpenAI Service.
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/07-create-workload-managed-identity.sh">
+VIEW: 07-create-workload-managed-identity.sh</a> 
 
 ```bash
 #!/bin/bash
@@ -2041,9 +2143,12 @@ else
 fi
 ```
 
-### ../scripts/08-create-service-account.sh
+### 08-create-service-account.sh
 
 This script creates the namespace and service account for the `magic8ball` chatbot and federate the service account with the user-defined managed identity created in the previous step.
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/08-create-service-account.sh">
+VIEW: 08-create-service-account.sh</a> 
 
 ```bash
 #!/bin/bash
@@ -2350,13 +2455,12 @@ These are the parameters defined by the configmap:
 
 
 
-### ../scripts/docs-deployment.yml
 
-
-### ../scripts/chat-deployment.yml
+### chat-deployment.yml
 
 The `deployment.yml` manifest is used create a Kubernetes [deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) that defines the application pods to create. [azure.workload.identity/use](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview#pod-labels) label is required in the pod template spec. Only pods with this label will be mutated by the azure-workload-identity mutating admission webhook to inject the Azure specific environment variables and the projected service account token volume.
 
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/chat-deployment.yml">VIEW: chat-deployment.yml</a>
 
 ```yaml
 apiVersion: apps/v1
@@ -2504,7 +2608,7 @@ spec:
     app: magic8ball
 ```
 
-**ingress.yml**
+## ingress.yml
 
 The `ingress.yml` manifest defines a Kubernetes [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object used to expose the service via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/).
 
@@ -2571,6 +2675,30 @@ Get-AzResource -ResourceGroupName "${RESC_GROUP_NAME}"
 
 
 <hr />
+
+
+<hr />
+
+WARNING: These are files in the script folder not yet documented in this article:
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/02-run-docker-container.sh">
+VIEW: 02-run-docker-container.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/03-push-docker-image.sh">
+VIEW: 03-push-docker-image.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/06-create-cluster-issuers.sh">
+VIEW: 06-create-cluster-issuers.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/09-deploy-apps.sh">
+VIEW: 09-deploy-apps.sh</a> 
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/10-configure-dns.sh">
+VIEW: 10-configure-dns.sh</a> 
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/install-packages-for-chainlit-demo.sh">
+VIEW: install-packages-for-chainlit-demo.sh</a> 
+
 
 
 <hr />
