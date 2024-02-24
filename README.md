@@ -567,17 +567,34 @@ All the containers above are collectively represented by one of group of <strong
 * <a target="_blank" href="#chainlit.md">chainlit.md</a>
 <br /><br />
 
-## Chat app
+<hr />
 
 ### chat.py
 
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/chat.py">chat.py</a>
+
 ### chat-configmap.yml
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/chat-configmap.yml">VIEW: chat-configmap.yml</a>
 
 ### chat-ingress.yml
 
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/chat-ingress.yml">VIEW: chat-ingress.yml</a>
+
+### chat-service.yml
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/chat-service.yml">VIEW: chat-service.yml</a>
+
+
 ### cluster-issuer-webapprouting.yml
 
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/cluster-issuer-webapprouting.yml">VIEW: cluster-issuer-webapprouting.yml</a>
+
+
 ### cluster-issuer-nginx.yml
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/cluster-issuer-nginx.yml">VIEW: cluster-issuer-nginx.yml</a>
+
 
 <hr />
 
@@ -585,13 +602,23 @@ All the containers above are collectively represented by one of group of <strong
 
 ### docs.py
 
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/docs.py">docs.py</a>
+
 ### docs-configmap.yml
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/docs-configmap.yml">VIEW: docs-configmap.yml</a>
 
 ### docs-ingress.yml
 
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/docs-ingress.yml">VIEW: docs-ingress.yml</a>
+
 ### docs-service.yml
 
-### chainlit.md
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/docs-service.yml">VIEW: docs-service.yml</a>
+
+### chainlit.md</a>
+
+<a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/chainlit.md">chainlit.md</a>
 
 
 <hr />
