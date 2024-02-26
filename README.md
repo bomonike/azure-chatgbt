@@ -24,8 +24,8 @@ Commentary about the technology used is presented to explain the configurations.
 ### A. Establish Prerequisites:
 
 1. <a href="#Install+Prerequisite+Utilities">Install Perequisite Utilities</a>
-1. <a href="#Download">Download from GitHub</a>
-1. <a href="#Files+and+Folders+in+This+Repo">Files and Folders in This Repo</a>
+1. <a href="#download-from-github">Download from GitHub</a>
+1. <a href="#files-and-folders-in-this-repo">Files and Folders in This Repo</a>
 
 1. <a href="#00-variables.sh">00-variables.sh</a>
    1. <a href="#Domain">Domain</a>
@@ -126,7 +126,9 @@ G. <a href="#Roadmap">Roadmap</a> for more
 
 This repo runs on Apple MacBook running macOS.
 
-Install these utilities, perhaps in one run of my <a target="https://wilsonmar.github.io/mac-setup/">mac-setup.zsh</a>:
+But NGINX commands in scripts run on Linux machines.
+
+On your macOS machine, install these utilities, perhaps in one run of my <a target="https://wilsonmar.github.io/mac-setup/">mac-setup.zsh</a>:
 
 1. macOS command-line (xcode-install)
 1. Ruby, Homebrew
@@ -159,6 +161,8 @@ Install these utilities, perhaps in one run of my <a target="https://wilsonmar.g
 
 <hr />
 
+<a name="download-from-github"></a>
+
 ## Download from GitHub
 
 1. Navigate to the folder where you want to create a repository from GitHub.com.
@@ -186,6 +190,8 @@ Install these utilities, perhaps in one run of my <a target="https://wilsonmar.g
 
 
 <hr/>
+
+<a name="files-and-folders-in-this-repo"></a>
 
 ## Files and Folders in This Repo
 
@@ -228,6 +234,8 @@ For the best quality rendering, the <a target="_blank" href="https://docs.github
 
 
 <hr />
+
+<a name="Secrets-Management"></a>
 
 ## Secrets Management
 
@@ -469,6 +477,8 @@ host="$subdomain.$dnsZoneName"
 
 <hr />
 
+<a name="01-build-docker-images.sh"></a>
+
 ## 01-build-docker-image.sh
 
 Run `01-build-docker-image.sh` in the `scripts` folder to build container images using the `Dockerfile` referencing various <tt>yaml</tt> files in the same folder:
@@ -496,111 +506,12 @@ done
 docker build -t $imageName:$tag -f Dockerfile .
   ```
 
-   <ul><a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/Dockerfile">https://github.com/bomonike/azure-chatgbt/tree/main/scripts/Dockerfile</a> 
-   </ul>
-
 1. Ensure that the Docker client is running.
 
 1. Review the Dockerfile (at time of this writing, the file's contents):
 
-   ```bash
-# app/Dockerfile
-
-# # Stage 1 - Install build dependencies
-
-# A Dockerfile must start with a FROM instruction which sets the base image for the container.
-# The Python images come in many flavors, each designed for a specific use case.
-# The python:3.11-slim image is a good base image for most applications.
-# It is a minimal image built on top of Debian Linux and includes only the necessary packages to run Python.
-# The slim image is a good choice because it is small and contains only the packages needed to run Python.
-# For more information, see: 
-# * https://hub.docker.com/_/python 
-# * https://docs.streamlit.io/knowledge-base/tutorials/deploy/docker
-FROM python:3.11-slim AS builder
-
-# The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile.
-# If the WORKDIR doesn’t exist, it will be created even if it’s not used in any subsequent Dockerfile instruction.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#workdir
-WORKDIR /app
-
-# Set environment variables. 
-# The ENV instruction sets the environment variable <key> to the value <value>.
-# This value will be in the environment of all “descendant” Dockerfile commands and can be replaced inline in many as well.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#env
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Install git so that we can clone the app code from a remote repo using the RUN instruction.
-# The RUN comand has 2 forms:
-# * RUN <command> (shell form, the command is run in a shell, which by default is /bin/sh -c on Linux or cmd /S /C on Windows)
-# * RUN ["executable", "param1", "param2"] (exec form)
-# The RUN instruction will execute any commands in a new layer on top of the current image and commit the results. 
-# The resulting committed image will be used for the next step in the Dockerfile.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#run
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    software-properties-common \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create a virtualenv to keep dependencies together
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Clone the requirements.txt which contains dependencies to WORKDIR
-# COPY has two forms:
-# * COPY <src> <dest> (this copies the files from the local machine to the container's own filesystem)
-# * COPY ["<src>",... "<dest>"] (this form is required for paths containing whitespace)
-# For more information, see: https://docs.docker.com/engine/reference/builder/#copy
-COPY requirements.txt .
-
-# Install the Python dependencies
-RUN pip install --no-cache-dir --no-deps -r requirements.txt
-
-# Stage 2 - Copy only necessary files to the runner stage
-
-# The FROM instruction initializes a new build stage for the application
-FROM python:3.11-slim
-
-# Sets the working directory to /app
-WORKDIR /app
-
-# Copy the virtual environment from the builder stage
-COPY --from=builder /opt/venv /opt/venv
-
-# Set environment variables
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Clone the app.py containing the application code
-COPY app.py .
-
-# Copy the images folder to WORKDIR
-# The ADD instruction copies new files, directories or remote file URLs from <src> and adds them to the filesystem of the image at the path <dest>.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#add
-ADD images ./images
-
-# The EXPOSE instruction informs Docker that the container listens on the specified network ports at runtime.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#expose
-EXPOSE 8501
-
-# The HEALTHCHECK instruction has two forms:
-# * HEALTHCHECK [OPTIONS] CMD command (check container health by running a command inside the container)
-# * HEALTHCHECK NONE (disable any healthcheck inherited from the base image)
-# The HEALTHCHECK instruction tells Docker how to test a container to check that it is still working. 
-# This can detect cases such as a web server that is stuck in an infinite loop and unable to handle new connections, 
-# even though the server process is still running. For more information, see: https://docs.docker.com/engine/reference/builder/#healthcheck
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
-
-# The ENTRYPOINT instruction has two forms:
-# * ENTRYPOINT ["executable", "param1", "param2"] (exec form, preferred)
-# * ENTRYPOINT command param1 param2 (shell form)
-# The ENTRYPOINT instruction allows you to configure a container that will run as an executable.
-# For more information, see: https://docs.docker.com/engine/reference/builder/#entrypoint
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
-```
-
-   PROTIPS:
+   <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/Dockerfile">
+   VIEW: Dockerfile</a> 
 
 1. TODO: Instead of using VirtualEnv, substitute use of Miniconda3 and download from the Conda rather than PyPi :
  
@@ -822,6 +733,7 @@ Terraform (.tf modules to deploy an [Azure Kubernetes Service(AKS)](https://docs
 
 Within folder terraform/modules are these module folders, listed alphabetically here to VIEW the <tt>main.tf</tt> file:
 
+<a name="aks"></a>
 
 ### aks
 
@@ -831,6 +743,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_kubernetes_cluster" "aks_cluster" {
    - "azurerm_monitor_diagnostic_setting" "settings" {
    <br /><br />
+
+   <a name="bastion_host"></a>
 
    ### bastion_host 
 
@@ -842,6 +756,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_monitor_diagnostic_setting" "pip_settings" {
    <br /><br />
 
+   <a name="container_registry"></a>
+
    ### container_registry 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/container_registry/main.tf">container_registry</a> defines these Azure resources:
@@ -851,6 +767,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_monitor_diagnostic_setting" "settings" {
    <br /><br />
    
+   <a name="deployment_script"></a>
+
    ### deployment_script 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/deployment_script/main.tf">deployment_script</a> defines these Azure resources:
@@ -860,6 +778,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_resource_deployment_script_azure_cli" "script" {
    <br /><br />
    
+   <a name="diagnostic_setting"></a>
+
    ### diagnostic_setting 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/diagnostic_setting/main.tf">diagnostic_setting</a> defines these Azure resources:
@@ -867,6 +787,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_monitor_diagnostic_setting" "settings" {
    <br /><br />
    
+   <a name="firewall"></a>
+
    ### firewall 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/firewall/main.tf">firewall</a> defines these Azure resources:
@@ -879,6 +801,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_monitor_diagnostic_setting" "pip_settings" {
    <br /><br />
    
+   <a name="grafana"></a>
+
    ### grafana 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/grafana/main.tf">grafana</a> defines these Azure resources:
@@ -888,6 +812,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_role_assignment" "grafana_admin" {
    <br /><br />
    
+   <a name="key_vault"></a>
+
    ### key_vault 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/key_vault/main.tf">key_vault</a> defines these Azure resources:
@@ -897,7 +823,9 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - 
    - 
    <br /><br />
-   
+
+   <a name="kubernetes"></a>
+
    ### kubernetes 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/main.tf">kubernetes</a> contains these *.tf (Terraform HCL) files:
@@ -919,6 +847,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/yaml/kube-prometheus-stack-custom-values.yaml">kube-prometheus-stack-custom-values.yaml</a>
    <br /><br />
    
+   <a name="log_analytics"></a>
+
    ### log_analytics 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/log_analytics/main.tf">log_analytics</a> defines these Azure resources:
@@ -926,7 +856,9 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_log_analytics_workspace" "log_analytics_workspace" {
    - "azurerm_log_analytics_solution" "la_solution" {
    <br /><br />
-   
+
+   <a name="nat_gateway"></a>
+
    ### nat_gateway 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/nat_gateway/main.tf">nat_gateway</a> defines these Azure resources:
@@ -936,7 +868,9 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_nat_gateway_public_ip_association" 
    - "azurerm_subnet_nat_gateway_association" "nat-avd-sessionhosts" {
    <br /><br />
-   
+
+   <a name="network_security_group"></a>
+
    ### network_security_group 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/network_security_group/main.tf">network_security_group</a> defines these Azure resources:
@@ -944,7 +878,9 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_network_security_group" "nsg" {
    - "azurerm_monitor_diagnostic_setting" "settings" {
    <br /><br />
-   
+
+   <a name="node_pool"></a>
+
    ### node_pool 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/node_pool/main.tf">node_pool</a> defines these Azure resources:
@@ -952,6 +888,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_kubernetes_cluster_node_pool" "node_pool" {
    <br /><br />
    
+   <a name="openai"></a>
+
    ### openai 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/openai/main.tf">openai</a> defines these Azure resources:
@@ -960,7 +898,9 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_cognitive_deployment" "deployment" {
    - "azurerm_monitor_diagnostic_setting" "settings" {
    <br /><br />
-   
+
+   <a name="private_dns_zone"></a>
+
    ### private_dns_zone 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/private_dns_zone/main.tf">private_dns_zone</a> defines these Azure resources:
@@ -968,14 +908,18 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_private_dns_zone" "private_dns_zone" {
    - "azurerm_private_dns_zone_virtual_network_link" "link" {
    <br /><br />
-   
+
+   <a name="private_endpoint"></a>
+
    ### private_endpoint 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/private_endpoint/main.tf">private_endpoint</a> defines these Azure resources:
 
    - "azurerm_private_endpoint" "private_endpoint" {
    <br /><br />
-   
+
+   <a name="prometheus"></a>
+
    ### prometheus 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/prometheus/main.tf">prometheus</a> defines these Azure resources:
@@ -990,6 +934,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules_rule_group_win" {
    <br /><br />
    
+   <a name="route_table"></a>
+
    ### route_table 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/route_table/main.tf">route_table</a> defines these Azure resources:
@@ -999,6 +945,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - (no output.tf)
    <br /><br />
    
+   <a name="storage_account"></a>
+
    ### storage_account 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/storage_account/main.tf">storage_account</a> defines these Azure resources:
@@ -1006,6 +954,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_storage_account" "storage_account" {
    <br /><br />
    
+   <a name="virtual_machine"></a>
+
    ### virtual_machine 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_machine/main.tf">virtual_machine</a> defines these Azure resources:
@@ -1020,6 +970,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_monitor_data_collection_rule_association" 
    <br /><br />
    
+   <a name="virtual_network"></a>
+
    ### virtual_network 
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_network/main.tf">virtual_network</a> defines these Azure resources:
@@ -1028,6 +980,8 @@ Within folder terraform/modules are these module folders, listed alphabetically 
    - "azurerm_subnet" "subnet" {
    - "azurerm_monitor_diagnostic_setting" "settings" {
    <br /><br />
+   
+   <a name="virtual_network_peering"></a>
    
    ### virtual_network_peering 
 
@@ -1229,6 +1183,8 @@ Each cluster contains the following Docker containers and Kubernetes services:
 All the containers above are collectively represented by one of group of <strong>purple icons</strong> at the right side of the diagram above and at the <a href="#Infrastructure-Architecture-Diagram">Infrastructure Architecture Diagram (below)</a>.
 
 
+<a name="install-packages-for-chainlit-demo.sh"></a>
+
 ### install-packages-for-chainlin-demo.sh
 
 <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/install-packages-for-chainlin-demo.sh">
@@ -1243,6 +1199,12 @@ $namespace using kubectl<br />
 $serviceAccountName
    <br /><br />
 
+https://github.com/jetstack
+
+
+<hr />
+
+<a name="09-deploy-apps.sh"></a>
 
 ### 09-deploy-apps.sh
 
@@ -1266,6 +1228,9 @@ $serviceAccountName
    * <a target="_blank" href="#chainlit.md">chainlit.md</a>
    <br /><br />
 
+<hr />
+
+<a name="10-configure-dns.sh"></a>
 
 ### 10-configure-dns.sh
 
@@ -1283,23 +1248,35 @@ For each $subdomain
 
 <hr />
 
+<a name="chat-configmap.yml"></a>
+
 ### chat-configmap.yml
 
 <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/chat-configmap.yml">VIEW: chat-configmap.yml</a>
 
+
+<a name="chat-ingress.yml"></a>
+
 ### chat-ingress.yml
 
 <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/chat-ingress.yml">VIEW: chat-ingress.yml</a>
+
+
+<a name="chat-service"></a>
 
 ### chat-service.yml
 
 <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/chat-service.yml">VIEW: chat-service.yml</a>
 
 
+<a name="cluster-issuer-nginx.yml"></a>
+
 ### cluster-issuer-webapprouting.yml
 
 <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/cluster-issuer-webapprouting.yml">VIEW: cluster-issuer-webapprouting.yml</a>
 
+
+<a name="cluster-issuer-webapprouting.yml"></a>
 
 ### cluster-issuer-nginx.yml
 
@@ -1310,29 +1287,44 @@ For each $subdomain
 
 ## docs app
 
+<a name="docs.py"></a>
+
 ### docs.py
 
 <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/docs.py">docs.py</a>
+
+
+<a name="docs-configmap.yml"></a>
 
 ### docs-configmap.yml
 
 <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/docs-configmap.yml">VIEW: docs-configmap.yml</a>
 
+
+<a name="docs-ingress.yml"></a>
+
 ### docs-ingress.yml
 
 <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/docs-ingress.yml">VIEW: docs-ingress.yml</a>
+
+
+<a name="docs-service.yml"></a>
 
 ### docs-service.yml
 
 <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/docs-service.yml">VIEW: docs-service.yml</a>
 
 
-### chainlit.md</a>
+<a name="chainlit.md"></a>
+
+### chainlit.md
 
 <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/chainlit.md">chainlit.md</a>
 
 
 <hr />
+
+<a name="03-push-docker-image.sh"></a>
 
 ### 03-push-docker-image.sh
 
@@ -1363,6 +1355,8 @@ docker push $loginServer/${imageName,,}:$tag
 ```
 
 
+<a name="Cert-Manager"></a>
+
 ### Cert-Manager
 
 1. [Cert-Manager](https://cert-manager.io/docs/): the Kubernetes `cert-manager` package and [Let's Encrypt](https://letsencrypt.org/) certificate authority are used to issue a TLS/SSL certificate to the chat applications.
@@ -1374,6 +1368,8 @@ docker push $loginServer/${imageName,,}:$tag
 <a target="_blank" href="https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-self-signed-certificate">Create a self-signed public certificate to authenticate your application</a>  Microsoft identity platform
 
 <hr />
+
+<a name="Build-Kubernetes"></a>
 
 ## Build Kubernetes
 
@@ -2475,6 +2471,9 @@ Alternately, to deploy the application in your AKS cluster, you can use the foll
 
 <hr />
 
+
+<a name="04-create-nginx-ingress-controller.sh"></a>
+
 ### 04-create-nginx-ingress-controller.sh
 
 This script installs the `NGINX Ingress Controller` using Helm.
@@ -2533,6 +2532,8 @@ SecRule REMOTE_ADDR "@ipMatch 127.0.0.1" "id:87,phase:1,pass,nolog,ctl:ruleEngin
 fi
 ```
 
+<a name="05-install-cert-manager.sh"></a>
+
 ### 05-install-cert-manager.sh
 
 This script installs the `cert-manager` using Helm.
@@ -2577,7 +2578,9 @@ else
 fi
 ```
 
-### ../scripts/06-create-cluster-issuer.sh
+<a name="06-create-cluster-issuers.sh"></a>
+
+### 06-create-cluster-issuer.sh
 
 This script creates a cluster issuer for the `NGINX Ingress Controller` based on the `Let's Encrypt` ACME certificate issuer.
 
@@ -2602,6 +2605,8 @@ else
     kubectl apply -f -
 fi
 ```
+
+<a name="07-create-workload-managed-identity.sh"></a>
 
 ### 07-create-workload-managed-identity.sh
 
@@ -2718,6 +2723,8 @@ else
   fi
 fi
 ```
+
+<a name="08-create-service-account.sh"></a>
 
 ### 08-create-service-account.sh
 
@@ -2836,6 +2843,8 @@ else
   echo "[$federatedIdentityName] federated identity credential already exists in the [$aksResourceGroupName] resource group"
 fi
 ```
+
+<a name="#09-deploy-app.sh"></a>
 
 ### 09-deploy-app.sh
 
@@ -3281,9 +3290,10 @@ Remove-AzResourceGroup -Name "${aksResourceGroupName}"
 
 ## G. Roadmap for more
 
+1. Typo DNDS
 1. GitHub Actions ?
 1. Diagram gradual reveal in PowerPoint
-1. To run in macOS, use brew as well as apt for Linux ?
+1. To run in macOS, use brew as well as apt for Linux within 10-configure-dns.sh
 1. minicube3 & conda commands instead of pip env ?
 
 <hr />

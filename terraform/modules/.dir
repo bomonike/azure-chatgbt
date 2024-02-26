@@ -1,22 +1,22 @@
-aks
-bastion_host
-container_registry
-deployment_script
-diagnostic_setting
-firewall
-grafana
-key_vault
-kubernetes
-log_analytics
-nat_gateway
-network_security_group
-node_pool
-openai
-private_dns_zone
-private_endpoint
-prometheus
-route_table
-storage_account
-virtual_machine
-virtual_network
-virtual_network_peering
+<ah	aks	</a>
+<ah	bastion_host	</a>
+<ah	container_registry	</a>
+<ah	deployment_script	</a>
+<ah	diagnostic_setting	</a>
+<ah	firewall	</a>
+<ah	grafana	</a>
+<ah	key_vault	</a>
+<ah	kubernetes	</a>
+<ah	log_analytics	</a>
+<ah	nat_gateway	</a>
+<ah	network_security_group	</a>
+<ah	node_pool	</a>
+<ah	openai	</a>
+<ah	private_dns_zone	</a>
+<ah	private_endpoint	</a>
+<ah	prometheus	</a>
+<ah	route_table	</a>
+<ah	storage_account	</a>
+<ah	virtual_machine	</a>
+<ah	virtual_network	</a>
+<ah	virtual_network_peering	</a>
