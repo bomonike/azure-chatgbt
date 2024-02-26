@@ -4,12 +4,13 @@ This summarizes the process:
 
 ## Phases and Steps
 
-<a href="#A.+Establish+Prerequisites:">A. Establish Prerequisites:</a> domain name, keys, etc.<br />
-<a href="#B.+Use+Terraform+to+establish+Azure+resources:">B. Use Terraform to establish Azure resources:</a/a><br />
-<a href="#C. Use Docker and Helm to establish Kubernetes cluster">C. Use Docker and Helm to establish Kubernetes cluster</a><br />
-<a href="#D.+Test">D. Test</a> functionality and performance<br />
-<a href="#E.+Clean+up+resources">E. Clean up resources</a><br />
-<a href="#F.+Roadmap">F. Roadmap</a> for more<br />
+<a href="#A.">A. Establish Prerequisites:</a> domain name, keys, etc.<br />
+<a href="#B.">B. Shell Scripts:</a><br />
+<a href="#C.">C. Use Terraform to establish Azure resources:</a><br />
+<a href="#d-use-docker-and-helm-to-establish-kubernetes-cluster">D. Use Docker and Helm to establish Kubernetes cluster</a><br />
+<a href="#E.">E. Test</a> functionality and performance<br />
+<a href="#F.">F. Clean up resources</a><br />
+<a href="#G.">G. Roadmap</a> for more<br />
 <br /><br />
 
 <hr />
@@ -18,12 +19,15 @@ The steps to make this happen.
 
 Commentary about the technology used is presented to explain the configurations.
 
+<a name="A.">
 ### A. Establish Prerequisites:
 
 1. <a href="#Install+Prerequisite+Utilities">Install Perequisite Utilities</a>
 1. <a href="#Download">Download from GitHub</a>
 1. <a href="#Files+and+Folders+in+This+Repo">Files and Folders in This Repo</a>
 
+1. <a href="#00-variables.sh">00-variables.sh</a>
+   1. <a href="#Domain">Domain</a>
 1. <a href="#Configure+Terraform+Variables">terraform.tfvars</a>
    1. <a href="#Secrets+Management">Secrets Management</a>
    1. <a href="#domain">domain, subdomain</a>
@@ -33,7 +37,27 @@ Commentary about the technology used is presented to explain the configurations.
    1. chainlit&service_account_name 
    1. openai_deployments
 
-   ### B. Use Terraform to establish Azure resources:
+
+<a name="B.">
+
+### B. Shell Scripts:
+
+1. <a href="#01-build-docker-images.sh">01-build-docker-images.sh</a> 
+1. <a href="#02-run-docker-container.sh">02-run-docker-container.sh</a> 
+1. <a href="#03-push-docker-image.sh">03-push-docker-image.sh</a>
+
+1. <a href="#04-create-nginx-ingress-controller.sh">04-create-nginx-ingress-controller.sh</a> 
+1. <a href="#05-install-cert-manager.sh">05-install-cert-manager.sh</a>
+
+1. <a href="#06-create-cluster-issuers.sh">06-create-cluster-issuers.sh</a> ?
+1. <a href="#07-create-workload-managed-identity.sh">07-create-workload-managed-identity.sh</a> 
+
+1. <a href="#08-create-service-account.sh">08-create-service-account.sh</a> 
+1. <a href="#09-deploy-apps.sh">09-deploy-apps.sh</a> ?
+1. <a href="#10-configure-dns.sh">10-configure-dns.sh</a> ?
+
+<a name="C.">
+### C. Use Terraform to establish Azure resources:
 
 1. <a href="#Terraform+Providers">Terraform Providers</a>
 1. <a href="#AKS+Resources+Deployed">AKS Resources Deployed</a>
@@ -52,24 +76,8 @@ Commentary about the technology used is presented to explain the configurations.
    1. <a href="#Compute">Compute</a>
 
 
- 
-   ### C. Use Docker and Helm to establish Kubernetes cluster:
-
-1. <a href="#00-variables.sh">00-variables.sh</a>
-   1. <a href="#Domain">Domain</a>
-1. <a href="#01-build-docker-images.sh">01-build-docker-images.sh</a> 
-1. <a href="#02-run-docker-container.sh">02-run-docker-container.sh</a> 
-1. <a href="#03-push-docker-image.sh">03-push-docker-image.sh</a>
-
-1. <a href="#04-create-nginx-ingress-controller.sh">04-create-nginx-ingress-controller.sh</a> 
-1. <a href="#05-install-cert-manager.sh">05-install-cert-manager.sh</a>
-
-1. <a href="#06-create-cluster-issuers.sh">06-create-cluster-issuers.sh</a> ?
-1. <a href="#07-create-workload-managed-identity.sh">07-create-workload-managed-identity.sh</a> 
-
-1. <a href="#08-create-service-account.sh">08-create-service-account.sh</a> 
-1. <a href="#09-deploy-apps.sh">09-deploy-apps.sh</a> ?
-1. <a href="#10-configure-dns.sh">10-configure-dns.sh</a> ?
+<a name="D.">
+### D. Use Docker and Helm to establish Kubernetes cluster:
 
 1. <a href="#install-packages-for-chainlit-demo.sh">install-packages-for-chainlit-demo.sh</a> 
    1. <a href="#The-ChatGPT-Applications">The ChatGPT Applications</a>
@@ -91,7 +99,8 @@ Commentary about the technology used is presented to explain the configurations.
 
 1. <a href="#Review+AKS+Resources+Deployed">Review AKS Resources Deployed</a>
 
-   ### D. <a href="Test">Test</a> functionality and performance:
+<a name="E.">
+### E. <a href="Test">Test</a> functionality and performance:
 
 1. <a href="#Use-ChatGPT+Application">Use ChatGPT Application</a>
 
@@ -99,6 +108,7 @@ E. <a href="#Clean+up+resources">Clean up resources</a>
 
 F. <a href="#Roadmap">Roadmap</a>
 <br /><br />
+
 
 <hr />
 
@@ -193,6 +203,7 @@ NOTE: GitHub was designed to house text, not images. So images referenced in thi
 
 An image for the repo should be a PNG, JPG, or GIF file under 1 MB in size. 
 For the best quality rendering, the <a target="_blank" href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview">recommended size</a> is at least 640 by 320 pixels (1280 by 640 pixels for best display).
+
 
 ### Folders
 
@@ -331,383 +342,7 @@ As specified in the diagram (below):
    <br /><br  />
 
 
-<hr />
-
-## Infrastructure Architecture Diagram
-
-The github repo downloaded provides a set of scripts invoking Terraform modules to deploy the following resources within Azure:
-
-<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1708631833/azure-chatbot-240221-1920x1080_kmm3pu.png"><img alt="azure-chatbot-240221-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1708631833/azure-chatbot-240221-1920x1080_kmm3pu.png"></a>
-
-The diagram above is based on Paolo's <a target="_blank" href="https://github.com/paolosalvatori/aks-openai-chainlit-terraform/blob/main/visio/architecture.vsdx">vsdx</a> as referenced <a target="_blank" href="https://techcommunity.microsoft.com/t5/fasttrack-for-azure/create-an-azure-openai-langchain-chromadb-and-chainlit-chat-app/ba-p/4024070createdJan8-2024">in his blog</a>.
-
-Items in red are <a href="#Terraform+Modules">Terraform Modules (below)</a>.
-
-
-### Terraform Modules
-
-Terraform (.tf modules to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). 
-
-Within folder terraform/modules are these module folders, listed alphabetically here to VIEW the <tt>main.tf</tt> file:
-
-
-&nbsp; &nbsp; ### aks
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/aks/main.tf">aks</a> defines these Azure resources:
-
-   - "azurerm_user_assigned_identity" "aks_identity" {
-   - "azurerm_kubernetes_cluster" "aks_cluster" {
-   - "azurerm_monitor_diagnostic_setting" "settings" {
-   <br /><br />
-
-   ### bastion_host 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/bastion_host/main.tf">bastion_host</a> defines these Azure resources:
-
-   - "azurerm_public_ip" "public_ip" {
-   - "azurerm_bastion_host" "bastion_host" {
-   - "azurerm_monitor_diagnostic_setting" "settings" {
-   - "azurerm_monitor_diagnostic_setting" "pip_settings" {
-   <br /><br />
-
-   ### container_registry 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/container_registry/main.tf">container_registry</a> defines these Azure resources:
-
-   - "azurerm_container_registry" "acr" {
-   - "azurerm_user_assigned_identity" "acr_identity" {
-   - "azurerm_monitor_diagnostic_setting" "settings" {
-   <br /><br />
-   
-   ### deployment_script 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/deployment_script/main.tf">deployment_script</a> defines these Azure resources:
-
-   - "azurerm_user_assigned_identity" "script_identity" {
-   - "azurerm_role_assignment" "network_contributor_assignment" {
-   - "azurerm_resource_deployment_script_azure_cli" "script" {
-   <br /><br />
-   
-   ### diagnostic_setting 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/diagnostic_setting/main.tf">diagnostic_setting</a> defines these Azure resources:
-
-   - "azurerm_monitor_diagnostic_setting" "settings" {
-   <br /><br />
-   
-   ### firewall 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/firewall/main.tf">firewall</a> defines these Azure resources:
-
-   - "azurerm_public_ip" "pip" {
-   - "azurerm_firewall" "firewall" {
-   - "azurerm_firewall_policy" "policy" {
-   - "azurerm_firewall_policy_rule_collection_group" "policy" {
-   - "azurerm_monitor_diagnostic_setting" "settings" {
-   - "azurerm_monitor_diagnostic_setting" "pip_settings" {
-   <br /><br />
-   
-   ### grafana 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/grafana/main.tf">grafana</a> defines these Azure resources:
-
-   - "azurerm_dashboard_grafana" "grafana" {
-   - "azurerm_role_assignment" "grafana" {
-   - "azurerm_role_assignment" "grafana_admin" {
-   <br /><br />
-   
-   ### key_vault 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/key_vault/main.tf">key_vault</a> defines these Azure resources:
-
-   - "azurerm_key_vault" "key_vault" {
-   - "azurerm_monitor_diagnostic_setting" "settings" {
-   - 
-   - 
-   <br /><br />
-   
-   ### kubernetes 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/main.tf">kubernetes</a> contains these *.tf (Terraform HCL) files:
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/certificate_manager.tf">kubernetes/certificate_manager.tf</a>
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/cluster_issuers.tf">kubernetes/cluster_issuers.tf</a>
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/managed_prometheus.tf">kubernetes/managed_prometheus.tf</a>
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/nginx_ingress_controller.tf">kubernetes/nginx_ingress_controller.tf</a>
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/prometheus.tf">kubernetes/prometheus.tf</a>
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/providers.tf">kubernetes/providers.tf</a>
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/variables.tf">kubernetes/variables.tf</a>
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/workload.tf">kubernetes/workload.tf</a>
-   <br /><br />
-
-   Additionally, ConfigMap yaml for use by Prometheus:
-   
-   - <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/yaml/ama-metrics-prometheus-config-configmap.yaml">ama-metrics-prometheus-config-configmap.yaml</a>
-   - <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/yaml/ama-metrics-settings-configmap.yaml">ama-metrics-settings-configmap.yaml</a>
-   - <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/yaml/kube-prometheus-stack-custom-values.yaml">kube-prometheus-stack-custom-values.yaml</a>
-   <br /><br />
-   
-   ### log_analytics 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/log_analytics/main.tf">log_analytics</a> defines these Azure resources:
-
-   - "azurerm_log_analytics_workspace" "log_analytics_workspace" {
-   - "azurerm_log_analytics_solution" "la_solution" {
-   <br /><br />
-   
-   ### nat_gateway 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/nat_gateway/main.tf">nat_gateway</a> defines these Azure resources:
-
-   - "azurerm_public_ip" "nat_gategay_public_ip" {
-   - "azurerm_nat_gateway" "nat_gateway" {
-   - "azurerm_nat_gateway_public_ip_association" 
-   - "azurerm_subnet_nat_gateway_association" "nat-avd-sessionhosts" {
-   <br /><br />
-   
-   ### network_security_group 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/network_security_group/main.tf">network_security_group</a> defines these Azure resources:
-
-   - "azurerm_network_security_group" "nsg" {
-   - "azurerm_monitor_diagnostic_setting" "settings" {
-   <br /><br />
-   
-   ### node_pool 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/node_pool/main.tf">node_pool</a> defines these Azure resources:
-
-   - "azurerm_kubernetes_cluster_node_pool" "node_pool" {
-   <br /><br />
-   
-   ### openai 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/openai/main.tf">openai</a> defines these Azure resources:
-
-   - "azurerm_cognitive_account" "openai" {
-   - "azurerm_cognitive_deployment" "deployment" {
-   - "azurerm_monitor_diagnostic_setting" "settings" {
-   <br /><br />
-   
-   ### private_dns_zone 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/private_dns_zone/main.tf">private_dns_zone</a> defines these Azure resources:
-
-   - "azurerm_private_dns_zone" "private_dns_zone" {
-   - "azurerm_private_dns_zone_virtual_network_link" "link" {
-   <br /><br />
-   
-   ### private_endpoint 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/private_endpoint/main.tf">private_endpoint</a> defines these Azure resources:
-
-   - "azurerm_private_endpoint" "private_endpoint" {
-   <br /><br />
-   
-   ### prometheus 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/prometheus/main.tf">prometheus</a> defines these Azure resources:
-
-   - "azurerm_monitor_workspace" "workspace" {
-   - "azurerm_monitor_data_collection_endpoint" "dce" {
-   - "azurerm_monitor_data_collection_rule" "dcr" {
-   - "azurerm_monitor_data_collection_rule_association" "dcra" {
-   - "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules_rule_group" {
-   - "azurerm_monitor_alert_prometheus_rule_group" "kubernetes_recording_rules_rule_group" {
-   - "azurerm_monitor_alert_prometheus_rule_group" "node_and_kubernetes_recording_rules_rule_group_win" {
-   - "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules_rule_group_win" {
-   <br /><br />
-   
-   ### route_table 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/route_table/main.tf">route_table</a> defines these Azure resources:
-
-   - "azurerm_route_table" "rt" {
-   - "azurerm_subnet_route_table_association" "subnet_association" {
-   - (no output.tf)
-   <br /><br />
-   
-   ### storage_account 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/storage_account/main.tf">storage_account</a> defines these Azure resources:
-
-   - "azurerm_storage_account" "storage_account" {
-   <br /><br />
-   
-   ### virtual_machine 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_machine/main.tf">virtual_machine</a> defines these Azure resources:
-
-   - "azurerm_public_ip" "public_ip" {
-   - "azurerm_network_security_group" "nsg" {
-   - "azurerm_network_interface" "nic" {
-   - "azurerm_network_interface_security_group_association" "nsg_association" {
-   - "azurerm_linux_virtual_machine" "virtual_machine" {
-   - "azurerm_virtual_machine_extension" "azure_monitor_agent" {
-   - "azurerm_monitor_data_collection_rule" "linux" {
-   - "azurerm_monitor_data_collection_rule_association" 
-   <br /><br />
-   
-   ### virtual_network 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_network/main.tf">virtual_network</a> defines these Azure resources:
-
-   - "azurerm_virtual_network" "vnet" {
-   - "azurerm_subnet" "subnet" {
-   - "azurerm_monitor_diagnostic_setting" "settings" {
-   <br /><br />
-   
-   ### virtual_network_peering 
-
-1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_network_peering/main.tf">virtual_network_peering</a> defines these Azure resources:
-
-   - [no output.tf]
-   - "azurerm_virtual_network_peering" "peering" {
-   - "azurerm_virtual_network_peering" "peering-back" {
-   <br /><br />
-
-Within each folder are several basic Terraform files (main.tf, outputs.tf, variables.tf).
-
-PROTIP: Internally, Terraform arranges the sequence which resources are created.
-
-
-### IAM
-
-1. [User-defined Managed Identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity): a user-defined managed identity used by the AKS cluster to create additional resources like load balancers and managed disks in Azure.
-
-2. [User-defined Managed Identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity): a user-defined managed identity used by the chatbot application to acquire a security token via [Microsoft Entra Workload ID](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) to call the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo) provided by the [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview).
-
-### Networking
-
-Terraform modules are parametric, so you can choose any network plugin:
-
-   - [Azure CNI with static IP allocation](https://learn.microsoft.com/en-us/azure/aks/configure-azure-cni)
-   - [Azure CNI with dynamic IP allocation](https://learn.microsoft.com/en-us/azure/aks/configure-azure-cni-dynamic-ip-allocation)
-   - [Azure CNI Powered by Cilium](https://learn.microsoft.com/en-us/azure/aks/azure-cni-powered-by-cilium)
-   - [Azure CNI Overlay](https://learn.microsoft.com/en-us/azure/aks/azure-cni-overlay)
-   - [BYO CNI](https://learn.microsoft.com/en-us/azure/aks/use-byo-cni?tabs=azure-cli)
-   - [Kubenet](https://learn.microsoft.com/en-us/azure/aks/configure-kubenet)
-   <br /><br />
-
-1. [Azure Bastion Host](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/bastion_host): a separate Azure Bastion is deployed in the AKS cluster virtual network to provide SSH connectivity to both agent nodes and virtual machines.
-
-1. [Azure NAT Gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway): a bring-your-own (BYO) [Azure NAT Gateway](https://learn.microsoft.com/en-us/azure/virtual-network/nat-gateway/nat-overview) to manage outbound connections initiated by AKS-hosted workloads. The NAT Gateway is associated to the `SystemSubnet`, `UserSubnet`, and `PodSubnet` subnets. The [outboundType](https://learn.microsoft.com/en-us/azure/aks/egress-outboundtype#outbound-type-of-managednatgateway-or-userassignednatgateway) property of the cluster is set to `userAssignedNatGateway` to specify that a BYO NAT Gateway is used for outbound connections. NOTE: you can update the `outboundType` after cluster creation and this will deploy or remove resources as required to put the cluster into the new egress configuration. For more information, see [Updating outboundType after cluster creation](https://learn.microsoft.com/en-us/azure/aks/egress-outboundtype#updating-outboundtype-after-cluster-creation-preview).
-
-### Private Endpoints
-
-1. [Azure Private Endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint): an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview) is created for each of the following resources:
-   - Azure OpenAI Service
-   - Azure Container Registry
-   - Azure Key Vault
-   - Azure Storage Account
-   - API Server when deploying a private AKS cluster.
-   <br /><br />
-
-   The `main.tf` module creates [Azure Private Endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) and [Azure Private DNDS Zones](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) for each of the following resources:
-
-   - Azure OpenAI Service
-   - Azure Container Registry
-   - Azure Key Vault
-   - Azure Storage Account
-   <br >/><br />
-
-   In particular, it creates an [Azure Private Endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) and [Azure Private DNS Zone](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) to the [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account) as shown in the following code snippet:
-
-   ```terraform
-module "openai_private_dns_zone" {
-  source                       = "./modules/private_dns_zone"
-  name                         = "privatelink.openai.azure.com"
-  resource_group_name          = azurerm_resource_group.rg.name
-  tags                         = var.tags
-  virtual_networks_to_link     = {
-    (module.virtual_network.name) = {
-      subscription_id = data.azurerm_client_config.current.subscription_id
-      resource_group_name = azurerm_resource_group.rg.name
-    }
-  }
-}
-
-module "openai_private_endpoint" {
-  source                         = "./modules/private_endpoint"
-  name                           = "${module.openai.name}PrivateEndpoint"
-  location                       = var.location
-  resource_group_name            = azurerm_resource_group.rg.name
-  subnet_id                      = module.virtual_network.subnet_ids[var.vm_subnet_name]
-  tags                           = var.tags
-  private_connection_resource_id = module.openai.id
-  is_manual_connection           = false
-  subresource_name               = "account"
-  private_dns_zone_group_name    = "AcrPrivateDnsZoneGroup"
-  private_dns_zone_group_ids     = [module.acr_private_dns_zone.id]
-}
-   ```
-
-### Azure Private DNS Zones
-
-1. [Azure Private DNS Zones](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone): an [Azure Private DNS Zone](https://docs.microsoft.com/en-us/azure/dns/private-dns-overview) is created for each of the following resources:
-   - Azure OpenAI Service
-   - Azure Container Registry
-   - Azure Key Vault
-   - Azure Storage Account
-   - API Server when deploying a private AKS cluster.
-   <br /><br />
-
-### Network Security Groups
-
-1. [Azure Network Security Groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/network_security_group): subnets hosting virtual machines and Azure Bastion Hosts are protected by [Azure Network Security Groups](https://docs.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview) that are used to filter inbound and outbound traffic.
-
-
-1. Workload namespace and service account: the [Kubectl Terraform Provider](https://registry.terraform.io/providers/cpanato/kubectl/latest/docs) and [Kubernetes Terraform Provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs) are used to create the namespace and service account used by the chat applications.
-
-
-### Azure Storage Account
-
-1. [Azure Storage Account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account): this storage account is used to store the boot diagnostics logs of both the service provider and service consumer virtual machines. Boot Diagnostics is a debugging feature that allows you to view console output and screenshots to diagnose virtual machine status.
-
-
-<em><strong>Utility Services:</strong></em>
-
-### Azure Key Vault
-
-1. [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault): an Azure Key Vault used to store secrets, certificates, and keys that can be mounted as files by pods using [Azure Key Vault Provider for Secrets Store CSI Driver](https://github.com/Azure/secrets-store-csi-driver-provider-azure). For more information, see [Use the Azure Key Vault Provider for Secrets Store CSI Driver in an AKS cluster](https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-driver) and [Provide an identity to access the Azure Key Vault Provider for Secrets Store CSI Driver](https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-identity-access).
-
-   TODO: Read sensitive configuration data such as passwords or SSH keys from a pre-existing Azure Key Vault resource. For more information, see [Referencing Azure Key Vault secrets in Terraform](https://thomasthornton.cloud/2022/02/26/referencing-azure-key-vault-secrets-in-terraform/).
-
-### Azure OpenAI Service
-
-1. [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account): an [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) with a [GPT-3.5](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo) model used by the chatbot application. Azure OpenAI Service gives customers advanced language AI with OpenAI GPT-4, GPT-3, Codex, and DALL-E models with the security and enterprise promise of Azure. Azure OpenAI co-develops the APIs with OpenAI, ensuring compatibility and a smooth transition from one to the other.
-
-
-### Monitoring
-
-1. Azure Monitor ConfigMaps for [Azure Monitor managed service for Prometheus](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/prometheus-metrics-overview) and `cert-manager` [Cluster Issuer](https://cert-manager.io/docs/configuration/) are deployed using the [Kubectl Terraform Provider](https://registry.terraform.io/providers/cpanato/kubectl/latest/docs) and [Kubernetes Terraform Provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs).`
-
-1. [Azure Monitor workspace](https://registry.terraform.io/providers/hashicorp/azurerm/3.83.0/docs/resources/monitor_workspace): An [Azure Monitor workspace](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/azure-monitor-workspace-overview) is a unique environment for data collected by [Azure Monitor](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/data-platform-metrics). Each workspace has its own data repository, configuration, and permissions. Log Analytics workspaces contain logs and metrics data from multiple Azure resources, whereas Azure Monitor workspaces currently contain only metrics related to [Prometheus](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/prometheus-metrics-overview). Azure Monitor managed service for Prometheus allows you to collect and analyze metrics at scale using a Prometheus-compatible monitoring solution, based on the [Prometheus](https://aka.ms/azureprometheus-promio). This fully managed service allows you to use the [Prometheus query language (PromQL)](https://aka.ms/azureprometheus-promio-promql) to analyze and alert on the performance of monitored infrastructure and workloads without having to operate the underlying infrastructure. The primary method for visualizing Prometheus metrics is [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview). You can connect your [Azure Monitor workspace](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/azure-monitor-workspace-overview) to an [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview) to visualize Prometheus metrics using a set of built-in and custom Grafana dashboards.
-
-1. [Azure Managed Grafana](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dashboard_grafana): an [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview) instance used to visualize the [Prometheus metrics](https://learn.microsoft.com/en-us/azure/azure-monitor/containers/prometheus-metrics-enable?tabs=azure-portal) generated by the [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster deployed by the Bicep modules. [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview) is a fully managed service for analytics and monitoring solutions. It's supported by Grafana Enterprise, which provides extensible data visualizations. This managed service allows to quickly and easily deploy Grafana dashboards with built-in high availability and control access with Azure security.
-
-1. [Prometheus](https://prometheus.io/): the AKS cluster is configured to collect metrics to the [Azure Monitor workspace](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/azure-monitor-workspace-overview) and [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview). Nonetheless, the [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack) Helm chart is used to install [Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/) on the AKS cluster.
-
-1. [Azure Log Analytics Workspace](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace): a centralized [Azure Log Analytics](https://docs.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-workspace-overview) workspace is used to collect the diagnostics logs and metrics from all the Azure resources:
-   - Azure OpenAI Service
-   - Azure Kubernetes Service cluster
-   - Azure Key Vault
-   - Azure Network Security Group
-   - Azure Container Registry
-   - Azure Storage Account
-   - Azure jump-box virtual machine
-   <br /><br />
-
-### Compute
-
-1. [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/): this sample compares the managed and unmanaged NGINX Ingress Controller. While the managed version is installed using the [Application routing add-on](https://learn.microsoft.com/en-us/azure/aks/app-routing), the unmanaged version is deployed using the [Helm Terraform Provider](https://registry.terraform.io/providers/hashicorp/helm/latest/docs). You can use the Helm provider to deploy software packages in Kubernetes. The provider needs to be configured with the proper credentials before it can be used.
-
-1. [Azure Virtual Machine](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine): Terraform modules can optionally create a jump-box virtual machine to manage the private AKS cluster.
-
-
-> **NOTE**  
-> In a production environment, we strongly recommend deploying a [private AKS cluster](https://docs.microsoft.com/en-us/azure/aks/private-clusters) with [Uptime SLA](https://docs.microsoft.com/en-us/azure/aks/uptime-sla). For more information, see [private AKS cluster with a Public DNS address](https://docs.microsoft.com/en-us/azure/aks/private-clusters#create-a-private-aks-cluster-with-a-public-dns-address). Alternatively, you can deploy a public AKS cluster and secure access to the API server using [authorized IP address ranges](https://learn.microsoft.com/en-us/azure/aks/api-server-authorized-ip-ranges).
-
+## Shell Scripts
 
 
 <hr />
@@ -1141,6 +776,7 @@ We add custom vector embeddings so that the Chat can answer questions about tele
    * SLAs (Sevice Level Agreements) - the agreements made with clients or users
 
    * SLOs (Service Level Objectives) - the objectives that must be achieved to meet the SLA
+   <br /><br />
 
 For more about this topic:
    * https://www.datacamp.com/tutorial/chromadb-tutorial-step-by-step-guide
@@ -1153,6 +789,387 @@ NOTE: The scope of apps here are not voice-enabled such as <a target="_blank" hr
    * Speech translation
    * Text-to-Speech
    <br /><br />
+
+
+
+
+<hr />
+
+## Infrastructure Architecture Diagram
+
+The github repo downloaded provides a set of scripts invoking Terraform modules to deploy the following resources within Azure:
+
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1708631833/azure-chatbot-240221-1920x1080_kmm3pu.png"><img alt="azure-chatbot-240221-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1708631833/azure-chatbot-240221-1920x1080_kmm3pu.png"></a>
+
+The diagram above is based on Paolo's <a target="_blank" href="https://github.com/paolosalvatori/aks-openai-chainlit-terraform/blob/main/visio/architecture.vsdx">vsdx</a> as referenced <a target="_blank" href="https://techcommunity.microsoft.com/t5/fasttrack-for-azure/create-an-azure-openai-langchain-chromadb-and-chainlit-chat-app/ba-p/4024070createdJan8-2024">in his blog</a>.
+
+Items in red are <a href="#Terraform+Modules">Terraform Modules (below)</a>.
+
+
+### Terraform Modules
+
+Terraform (.tf modules to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). 
+
+Within folder terraform/modules are these module folders, listed alphabetically here to VIEW the <tt>main.tf</tt> file:
+
+
+### aks
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/aks/main.tf">aks</a> defines these Azure resources:
+
+   - "azurerm_user_assigned_identity" "aks_identity" {
+   - "azurerm_kubernetes_cluster" "aks_cluster" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
+
+   ### bastion_host 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/bastion_host/main.tf">bastion_host</a> defines these Azure resources:
+
+   - "azurerm_public_ip" "public_ip" {
+   - "azurerm_bastion_host" "bastion_host" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   - "azurerm_monitor_diagnostic_setting" "pip_settings" {
+   <br /><br />
+
+   ### container_registry 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/container_registry/main.tf">container_registry</a> defines these Azure resources:
+
+   - "azurerm_container_registry" "acr" {
+   - "azurerm_user_assigned_identity" "acr_identity" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
+   
+   ### deployment_script 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/deployment_script/main.tf">deployment_script</a> defines these Azure resources:
+
+   - "azurerm_user_assigned_identity" "script_identity" {
+   - "azurerm_role_assignment" "network_contributor_assignment" {
+   - "azurerm_resource_deployment_script_azure_cli" "script" {
+   <br /><br />
+   
+   ### diagnostic_setting 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/diagnostic_setting/main.tf">diagnostic_setting</a> defines these Azure resources:
+
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
+   
+   ### firewall 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/firewall/main.tf">firewall</a> defines these Azure resources:
+
+   - "azurerm_public_ip" "pip" {
+   - "azurerm_firewall" "firewall" {
+   - "azurerm_firewall_policy" "policy" {
+   - "azurerm_firewall_policy_rule_collection_group" "policy" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   - "azurerm_monitor_diagnostic_setting" "pip_settings" {
+   <br /><br />
+   
+   ### grafana 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/grafana/main.tf">grafana</a> defines these Azure resources:
+
+   - "azurerm_dashboard_grafana" "grafana" {
+   - "azurerm_role_assignment" "grafana" {
+   - "azurerm_role_assignment" "grafana_admin" {
+   <br /><br />
+   
+   ### key_vault 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/key_vault/main.tf">key_vault</a> defines these Azure resources:
+
+   - "azurerm_key_vault" "key_vault" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   - 
+   - 
+   <br /><br />
+   
+   ### kubernetes 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/main.tf">kubernetes</a> contains these *.tf (Terraform HCL) files:
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/certificate_manager.tf">kubernetes/certificate_manager.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/cluster_issuers.tf">kubernetes/cluster_issuers.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/managed_prometheus.tf">kubernetes/managed_prometheus.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/nginx_ingress_controller.tf">kubernetes/nginx_ingress_controller.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/prometheus.tf">kubernetes/prometheus.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/providers.tf">kubernetes/providers.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/variables.tf">kubernetes/variables.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/workload.tf">kubernetes/workload.tf</a>
+   <br /><br />
+
+   Additionally, ConfigMap yaml for use by Prometheus:
+
+   - <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/yaml/ama-metrics-prometheus-config-configmap.yaml">ama-metrics-prometheus-config-configmap.yaml</a>
+   - <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/yaml/ama-metrics-settings-configmap.yaml">ama-metrics-settings-configmap.yaml</a>
+   - <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/yaml/kube-prometheus-stack-custom-values.yaml">kube-prometheus-stack-custom-values.yaml</a>
+   <br /><br />
+   
+   ### log_analytics 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/log_analytics/main.tf">log_analytics</a> defines these Azure resources:
+
+   - "azurerm_log_analytics_workspace" "log_analytics_workspace" {
+   - "azurerm_log_analytics_solution" "la_solution" {
+   <br /><br />
+   
+   ### nat_gateway 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/nat_gateway/main.tf">nat_gateway</a> defines these Azure resources:
+
+   - "azurerm_public_ip" "nat_gategay_public_ip" {
+   - "azurerm_nat_gateway" "nat_gateway" {
+   - "azurerm_nat_gateway_public_ip_association" 
+   - "azurerm_subnet_nat_gateway_association" "nat-avd-sessionhosts" {
+   <br /><br />
+   
+   ### network_security_group 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/network_security_group/main.tf">network_security_group</a> defines these Azure resources:
+
+   - "azurerm_network_security_group" "nsg" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
+   
+   ### node_pool 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/node_pool/main.tf">node_pool</a> defines these Azure resources:
+
+   - "azurerm_kubernetes_cluster_node_pool" "node_pool" {
+   <br /><br />
+   
+   ### openai 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/openai/main.tf">openai</a> defines these Azure resources:
+
+   - "azurerm_cognitive_account" "openai" {
+   - "azurerm_cognitive_deployment" "deployment" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
+   
+   ### private_dns_zone 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/private_dns_zone/main.tf">private_dns_zone</a> defines these Azure resources:
+
+   - "azurerm_private_dns_zone" "private_dns_zone" {
+   - "azurerm_private_dns_zone_virtual_network_link" "link" {
+   <br /><br />
+   
+   ### private_endpoint 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/private_endpoint/main.tf">private_endpoint</a> defines these Azure resources:
+
+   - "azurerm_private_endpoint" "private_endpoint" {
+   <br /><br />
+   
+   ### prometheus 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/prometheus/main.tf">prometheus</a> defines these Azure resources:
+
+   - "azurerm_monitor_workspace" "workspace" {
+   - "azurerm_monitor_data_collection_endpoint" "dce" {
+   - "azurerm_monitor_data_collection_rule" "dcr" {
+   - "azurerm_monitor_data_collection_rule_association" "dcra" {
+   - "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules_rule_group" {
+   - "azurerm_monitor_alert_prometheus_rule_group" "kubernetes_recording_rules_rule_group" {
+   - "azurerm_monitor_alert_prometheus_rule_group" "node_and_kubernetes_recording_rules_rule_group_win" {
+   - "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules_rule_group_win" {
+   <br /><br />
+   
+   ### route_table 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/route_table/main.tf">route_table</a> defines these Azure resources:
+
+   - "azurerm_route_table" "rt" {
+   - "azurerm_subnet_route_table_association" "subnet_association" {
+   - (no output.tf)
+   <br /><br />
+   
+   ### storage_account 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/storage_account/main.tf">storage_account</a> defines these Azure resources:
+
+   - "azurerm_storage_account" "storage_account" {
+   <br /><br />
+   
+   ### virtual_machine 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_machine/main.tf">virtual_machine</a> defines these Azure resources:
+
+   - "azurerm_public_ip" "public_ip" {
+   - "azurerm_network_security_group" "nsg" {
+   - "azurerm_network_interface" "nic" {
+   - "azurerm_network_interface_security_group_association" "nsg_association" {
+   - "azurerm_linux_virtual_machine" "virtual_machine" {
+   - "azurerm_virtual_machine_extension" "azure_monitor_agent" {
+   - "azurerm_monitor_data_collection_rule" "linux" {
+   - "azurerm_monitor_data_collection_rule_association" 
+   <br /><br />
+   
+   ### virtual_network 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_network/main.tf">virtual_network</a> defines these Azure resources:
+
+   - "azurerm_virtual_network" "vnet" {
+   - "azurerm_subnet" "subnet" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
+   
+   ### virtual_network_peering 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_network_peering/main.tf">virtual_network_peering</a> defines these Azure resources:
+
+   - [no output.tf]
+   - "azurerm_virtual_network_peering" "peering" {
+   - "azurerm_virtual_network_peering" "peering-back" {
+   <br /><br />
+
+Within each folder are several basic Terraform files (main.tf, outputs.tf, variables.tf).
+
+PROTIP: Internally, Terraform arranges the sequence which resources are created.
+
+
+### IAM
+
+1. [User-defined Managed Identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity): a user-defined managed identity used by the AKS cluster to create additional resources like load balancers and managed disks in Azure.
+
+2. [User-defined Managed Identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity): a user-defined managed identity used by the chatbot application to acquire a security token via [Microsoft Entra Workload ID](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) to call the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo) provided by the [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview).
+
+### Networking
+
+Terraform modules are parametric, so you can choose any network plugin:
+
+   - [Azure CNI with static IP allocation](https://learn.microsoft.com/en-us/azure/aks/configure-azure-cni)
+   - [Azure CNI with dynamic IP allocation](https://learn.microsoft.com/en-us/azure/aks/configure-azure-cni-dynamic-ip-allocation)
+   - [Azure CNI Powered by Cilium](https://learn.microsoft.com/en-us/azure/aks/azure-cni-powered-by-cilium)
+   - [Azure CNI Overlay](https://learn.microsoft.com/en-us/azure/aks/azure-cni-overlay)
+   - [BYO CNI](https://learn.microsoft.com/en-us/azure/aks/use-byo-cni?tabs=azure-cli)
+   - [Kubenet](https://learn.microsoft.com/en-us/azure/aks/configure-kubenet)
+   <br /><br />
+
+1. [Azure Bastion Host](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/bastion_host): a separate Azure Bastion is deployed in the AKS cluster virtual network to provide SSH connectivity to both agent nodes and virtual machines.
+
+1. [Azure NAT Gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway): a bring-your-own (BYO) [Azure NAT Gateway](https://learn.microsoft.com/en-us/azure/virtual-network/nat-gateway/nat-overview) to manage outbound connections initiated by AKS-hosted workloads. The NAT Gateway is associated to the `SystemSubnet`, `UserSubnet`, and `PodSubnet` subnets. The [outboundType](https://learn.microsoft.com/en-us/azure/aks/egress-outboundtype#outbound-type-of-managednatgateway-or-userassignednatgateway) property of the cluster is set to `userAssignedNatGateway` to specify that a BYO NAT Gateway is used for outbound connections. NOTE: you can update the `outboundType` after cluster creation and this will deploy or remove resources as required to put the cluster into the new egress configuration. For more information, see [Updating outboundType after cluster creation](https://learn.microsoft.com/en-us/azure/aks/egress-outboundtype#updating-outboundtype-after-cluster-creation-preview).
+
+### Private Endpoints
+
+1. [Azure Private Endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint): an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview) is created for each of the following resources:
+   - Azure OpenAI Service
+   - Azure Container Registry
+   - Azure Key Vault
+   - Azure Storage Account
+   - API Server when deploying a private AKS cluster.
+   <br /><br />
+
+   The `main.tf` module creates [Azure Private Endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) and [Azure Private DNDS Zones](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) for each of the following resources:
+
+   - Azure OpenAI Service
+   - Azure Container Registry
+   - Azure Key Vault
+   - Azure Storage Account
+   <br >/><br />
+
+   In particular, it creates an [Azure Private Endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) and [Azure Private DNS Zone](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) to the [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account) as shown in the following code snippet:
+
+   ```terraform
+module "openai_private_dns_zone" {
+  source                       = "./modules/private_dns_zone"
+  name                         = "privatelink.openai.azure.com"
+  resource_group_name          = azurerm_resource_group.rg.name
+  tags                         = var.tags
+  virtual_networks_to_link     = {
+    (module.virtual_network.name) = {
+      subscription_id = data.azurerm_client_config.current.subscription_id
+      resource_group_name = azurerm_resource_group.rg.name
+    }
+  }
+}
+
+module "openai_private_endpoint" {
+  source                         = "./modules/private_endpoint"
+  name                           = "${module.openai.name}PrivateEndpoint"
+  location                       = var.location
+  resource_group_name            = azurerm_resource_group.rg.name
+  subnet_id                      = module.virtual_network.subnet_ids[var.vm_subnet_name]
+  tags                           = var.tags
+  private_connection_resource_id = module.openai.id
+  is_manual_connection           = false
+  subresource_name               = "account"
+  private_dns_zone_group_name    = "AcrPrivateDnsZoneGroup"
+  private_dns_zone_group_ids     = [module.acr_private_dns_zone.id]
+}
+   ```
+
+### Azure Private DNS Zones
+
+1. [Azure Private DNS Zones](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone): an [Azure Private DNS Zone](https://docs.microsoft.com/en-us/azure/dns/private-dns-overview) is created for each of the following resources:
+   - Azure OpenAI Service
+   - Azure Container Registry
+   - Azure Key Vault
+   - Azure Storage Account
+   - API Server when deploying a private AKS cluster.
+   <br /><br />
+
+### Network Security Groups
+
+1. [Azure Network Security Groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/network_security_group): subnets hosting virtual machines and Azure Bastion Hosts are protected by [Azure Network Security Groups](https://docs.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview) that are used to filter inbound and outbound traffic.
+
+
+1. Workload namespace and service account: the [Kubectl Terraform Provider](https://registry.terraform.io/providers/cpanato/kubectl/latest/docs) and [Kubernetes Terraform Provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs) are used to create the namespace and service account used by the chat applications.
+
+
+### Azure Storage Account
+
+1. [Azure Storage Account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account): this storage account is used to store the boot diagnostics logs of both the service provider and service consumer virtual machines. Boot Diagnostics is a debugging feature that allows you to view console output and screenshots to diagnose virtual machine status.
+
+
+<em><strong>Utility Services:</strong></em>
+
+### Azure Key Vault
+
+1. [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault): an Azure Key Vault used to store secrets, certificates, and keys that can be mounted as files by pods using [Azure Key Vault Provider for Secrets Store CSI Driver](https://github.com/Azure/secrets-store-csi-driver-provider-azure). For more information, see [Use the Azure Key Vault Provider for Secrets Store CSI Driver in an AKS cluster](https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-driver) and [Provide an identity to access the Azure Key Vault Provider for Secrets Store CSI Driver](https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-identity-access).
+
+   TODO: Read sensitive configuration data such as passwords or SSH keys from a pre-existing Azure Key Vault resource. For more information, see [Referencing Azure Key Vault secrets in Terraform](https://thomasthornton.cloud/2022/02/26/referencing-azure-key-vault-secrets-in-terraform/).
+
+### Azure OpenAI Service
+
+1. [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account): an [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) with a [GPT-3.5](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo) model used by the chatbot application. Azure OpenAI Service gives customers advanced language AI with OpenAI GPT-4, GPT-3, Codex, and DALL-E models with the security and enterprise promise of Azure. Azure OpenAI co-develops the APIs with OpenAI, ensuring compatibility and a smooth transition from one to the other.
+
+
+### Monitoring
+
+1. Azure Monitor ConfigMaps for [Azure Monitor managed service for Prometheus](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/prometheus-metrics-overview) and `cert-manager` [Cluster Issuer](https://cert-manager.io/docs/configuration/) are deployed using the [Kubectl Terraform Provider](https://registry.terraform.io/providers/cpanato/kubectl/latest/docs) and [Kubernetes Terraform Provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs).`
+
+1. [Azure Monitor workspace](https://registry.terraform.io/providers/hashicorp/azurerm/3.83.0/docs/resources/monitor_workspace): An [Azure Monitor workspace](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/azure-monitor-workspace-overview) is a unique environment for data collected by [Azure Monitor](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/data-platform-metrics). Each workspace has its own data repository, configuration, and permissions. Log Analytics workspaces contain logs and metrics data from multiple Azure resources, whereas Azure Monitor workspaces currently contain only metrics related to [Prometheus](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/prometheus-metrics-overview). Azure Monitor managed service for Prometheus allows you to collect and analyze metrics at scale using a Prometheus-compatible monitoring solution, based on the [Prometheus](https://aka.ms/azureprometheus-promio). This fully managed service allows you to use the [Prometheus query language (PromQL)](https://aka.ms/azureprometheus-promio-promql) to analyze and alert on the performance of monitored infrastructure and workloads without having to operate the underlying infrastructure. The primary method for visualizing Prometheus metrics is [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview). You can connect your [Azure Monitor workspace](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/azure-monitor-workspace-overview) to an [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview) to visualize Prometheus metrics using a set of built-in and custom Grafana dashboards.
+
+1. [Azure Managed Grafana](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dashboard_grafana): an [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview) instance used to visualize the [Prometheus metrics](https://learn.microsoft.com/en-us/azure/azure-monitor/containers/prometheus-metrics-enable?tabs=azure-portal) generated by the [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster deployed by the Bicep modules. [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview) is a fully managed service for analytics and monitoring solutions. It's supported by Grafana Enterprise, which provides extensible data visualizations. This managed service allows to quickly and easily deploy Grafana dashboards with built-in high availability and control access with Azure security.
+
+1. [Prometheus](https://prometheus.io/): the AKS cluster is configured to collect metrics to the [Azure Monitor workspace](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/azure-monitor-workspace-overview) and [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview). Nonetheless, the [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack) Helm chart is used to install [Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/) on the AKS cluster.
+
+1. [Azure Log Analytics Workspace](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace): a centralized [Azure Log Analytics](https://docs.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-workspace-overview) workspace is used to collect the diagnostics logs and metrics from all the Azure resources:
+   - Azure OpenAI Service
+   - Azure Kubernetes Service cluster
+   - Azure Key Vault
+   - Azure Network Security Group
+   - Azure Container Registry
+   - Azure Storage Account
+   - Azure jump-box virtual machine
+   <br /><br />
+
+### Compute
+
+1. [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/): this sample compares the managed and unmanaged NGINX Ingress Controller. While the managed version is installed using the [Application routing add-on](https://learn.microsoft.com/en-us/azure/aks/app-routing), the unmanaged version is deployed using the [Helm Terraform Provider](https://registry.terraform.io/providers/hashicorp/helm/latest/docs). You can use the Helm provider to deploy software packages in Kubernetes. The provider needs to be configured with the proper credentials before it can be used.
+
+1. [Azure Virtual Machine](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine): Terraform modules can optionally create a jump-box virtual machine to manage the private AKS cluster.
+
+
+> **NOTE**  
+> In a production environment, we strongly recommend deploying a [private AKS cluster](https://docs.microsoft.com/en-us/azure/aks/private-clusters) with [Uptime SLA](https://docs.microsoft.com/en-us/azure/aks/uptime-sla). For more information, see [private AKS cluster with a Public DNS address](https://docs.microsoft.com/en-us/azure/aks/private-clusters#create-a-private-aks-cluster-with-a-public-dns-address). Alternatively, you can deploy a public AKS cluster and secure access to the API server using [authorized IP address ranges](https://learn.microsoft.com/en-us/azure/aks/api-server-authorized-ip-ranges).
+
 
 
 <hr />
