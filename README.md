@@ -4,11 +4,12 @@ This summarizes the process:
 
 ## Phases and Steps
 
-A. Establish Prerequisites: domain name, keys, 
-B. Use Terraform to establish networks and other Azure resources
-C. Use Docker and Helm to establish Kubernetes cluster
-D. <a href="Test">Test</a> functionality and performance
-E. <a href="#Clean+up+resources">Clean up resources</a>
+<a href="#A.+Establish+Prerequisites:">A. Establish Prerequisites:</a> domain name, keys, etc.<br />
+<a href="#B.+Use+Terraform+to+establish+Azure+resources:">B. Use Terraform to establish Azure resources:</a/a><br />
+<a href="#C. Use Docker and Helm to establish Kubernetes cluster">C. Use Docker and Helm to establish Kubernetes cluster</a><br />
+<a href="#D.+Test">D. Test</a> functionality and performance<br />
+<a href="#E.+Clean+up+resources">E. Clean up resources</a><br />
+<a href="#F.+Roadmap">F. Roadmap</a> for more<br />
 <br /><br />
 
 <hr />
@@ -18,6 +19,7 @@ The steps to make this happen.
 Commentary about the technology used is presented to explain the configurations.
 
 ### A. Establish Prerequisites:
+
 1. <a href="#Install+Prerequisite+Utilities">Install Perequisite Utilities</a>
 1. <a href="#Download">Download from GitHub</a>
 1. <a href="#Files+and+Folders+in+This+Repo">Files and Folders in This Repo</a>
@@ -31,7 +33,7 @@ Commentary about the technology used is presented to explain the configurations.
    1. chainlit&service_account_name 
    1. openai_deployments
 
-   ### B. Use Terraform to establish networks and other Azure resources:
+   ### B. Use Terraform to establish Azure resources:
 
 1. <a href="#Terraform+Providers">Terraform Providers</a>
 1. <a href="#AKS+Resources+Deployed">AKS Resources Deployed</a>
@@ -346,52 +348,222 @@ Items in red are <a href="#Terraform+Modules">Terraform Modules (below)</a>.
 
 Terraform (.tf modules to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). 
 
-Within folder terraform/modules are these module folders, listed alphabetically here to 
-VIEW the <tt>main.tf</tt> file:
+Within folder terraform/modules are these module folders, listed alphabetically here to VIEW the <tt>main.tf</tt> file:
 
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/aks/main.tf">aks</a>
 
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/bastion_host/main.tf">bastion_host</a>
+&nbsp; &nbsp; ### aks
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/aks/main.tf">aks</a> defines these Azure resources:
+
+   - "azurerm_user_assigned_identity" "aks_identity" {
+   - "azurerm_kubernetes_cluster" "aks_cluster" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
+
+   ### bastion_host 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/bastion_host/main.tf">bastion_host</a> defines these Azure resources:
+
+   - "azurerm_public_ip" "public_ip" {
+   - "azurerm_bastion_host" "bastion_host" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   - "azurerm_monitor_diagnostic_setting" "pip_settings" {
+   <br /><br />
+
+   ### container_registry 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/container_registry/main.tf">container_registry</a> defines these Azure resources:
+
+   - "azurerm_container_registry" "acr" {
+   - "azurerm_user_assigned_identity" "acr_identity" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/container_registry/main.tf">container_registry</a>
+   ### deployment_script 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/deployment_script/main.tf">deployment_script</a> defines these Azure resources:
+
+   - "azurerm_user_assigned_identity" "script_identity" {
+   - "azurerm_role_assignment" "network_contributor_assignment" {
+   - "azurerm_resource_deployment_script_azure_cli" "script" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/deployment_script/main.tf">deployment_script</a>
+   ### diagnostic_setting 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/diagnostic_setting/main.tf">diagnostic_setting</a> defines these Azure resources:
+
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/diagnostic_setting/main.tf">diagnostic_setting</a>
+   ### firewall 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/firewall/main.tf">firewall</a> defines these Azure resources:
+
+   - "azurerm_public_ip" "pip" {
+   - "azurerm_firewall" "firewall" {
+   - "azurerm_firewall_policy" "policy" {
+   - "azurerm_firewall_policy_rule_collection_group" "policy" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   - "azurerm_monitor_diagnostic_setting" "pip_settings" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/firewall/main.tf">firewall</a>
+   ### grafana 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/grafana/main.tf">grafana</a> defines these Azure resources:
+
+   - "azurerm_dashboard_grafana" "grafana" {
+   - "azurerm_role_assignment" "grafana" {
+   - "azurerm_role_assignment" "grafana_admin" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/grafana/main.tf">grafana</a>
+   ### key_vault 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/key_vault/main.tf">key_vault</a> defines these Azure resources:
+
+   - "azurerm_key_vault" "key_vault" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   - 
+   - 
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/key_vault/main.tf">key_vault</a>
+   ### kubernetes 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/main.tf">kubernetes</a> contains these *.tf (Terraform HCL) files:
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/certificate_manager.tf">kubernetes/certificate_manager.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/cluster_issuers.tf">kubernetes/cluster_issuers.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/managed_prometheus.tf">kubernetes/managed_prometheus.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/nginx_ingress_controller.tf">kubernetes/nginx_ingress_controller.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/prometheus.tf">kubernetes/prometheus.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/providers.tf">kubernetes/providers.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/variables.tf">kubernetes/variables.tf</a>
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/workload.tf">kubernetes/workload.tf</a>
+   <br /><br />
+
+   Additionally, ConfigMap yaml for use by Prometheus:
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/main.tf">kubernetes</a>
+   - <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/yaml/ama-metrics-prometheus-config-configmap.yaml">ama-metrics-prometheus-config-configmap.yaml</a>
+   - <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/yaml/ama-metrics-settings-configmap.yaml">ama-metrics-settings-configmap.yaml</a>
+   - <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/yaml/kube-prometheus-stack-custom-values.yaml">kube-prometheus-stack-custom-values.yaml</a>
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/log_analytics/main.tf">log_analytics</a>
+   ### log_analytics 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/log_analytics/main.tf">log_analytics</a> defines these Azure resources:
+
+   - "azurerm_log_analytics_workspace" "log_analytics_workspace" {
+   - "azurerm_log_analytics_solution" "la_solution" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/nat_gateway/main.tf">nat_gateway</a>
+   ### nat_gateway 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/nat_gateway/main.tf">nat_gateway</a> defines these Azure resources:
+
+   - "azurerm_public_ip" "nat_gategay_public_ip" {
+   - "azurerm_nat_gateway" "nat_gateway" {
+   - "azurerm_nat_gateway_public_ip_association" 
+   - "azurerm_subnet_nat_gateway_association" "nat-avd-sessionhosts" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/network_security_group/main.tf">network_security_group</a>
+   ### network_security_group 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/network_security_group/main.tf">network_security_group</a> defines these Azure resources:
+
+   - "azurerm_network_security_group" "nsg" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/node_pool/main.tf">node_pool</a>
+   ### node_pool 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/node_pool/main.tf">node_pool</a> defines these Azure resources:
+
+   - "azurerm_kubernetes_cluster_node_pool" "node_pool" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/openai/main.tf">openai</a>
+   ### openai 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/openai/main.tf">openai</a> defines these Azure resources:
+
+   - "azurerm_cognitive_account" "openai" {
+   - "azurerm_cognitive_deployment" "deployment" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/private_dns_zone/main.tf">private_dns_zone</a>
+   ### private_dns_zone 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/private_dns_zone/main.tf">private_dns_zone</a> defines these Azure resources:
+
+   - "azurerm_private_dns_zone" "private_dns_zone" {
+   - "azurerm_private_dns_zone_virtual_network_link" "link" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/private_endpoint/main.tf">private_endpoint</a>
+   ### private_endpoint 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/private_endpoint/main.tf">private_endpoint</a> defines these Azure resources:
+
+   - "azurerm_private_endpoint" "private_endpoint" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/prometheus/main.tf">prometheus</a>
+   ### prometheus 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/prometheus/main.tf">prometheus</a> defines these Azure resources:
+
+   - "azurerm_monitor_workspace" "workspace" {
+   - "azurerm_monitor_data_collection_endpoint" "dce" {
+   - "azurerm_monitor_data_collection_rule" "dcr" {
+   - "azurerm_monitor_data_collection_rule_association" "dcra" {
+   - "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules_rule_group" {
+   - "azurerm_monitor_alert_prometheus_rule_group" "kubernetes_recording_rules_rule_group" {
+   - "azurerm_monitor_alert_prometheus_rule_group" "node_and_kubernetes_recording_rules_rule_group_win" {
+   - "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules_rule_group_win" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/route_table/main.tf">route_table</a>
+   ### route_table 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/route_table/main.tf">route_table</a> defines these Azure resources:
+
+   - "azurerm_route_table" "rt" {
+   - "azurerm_subnet_route_table_association" "subnet_association" {
+   - (no output.tf)
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/storage_account/main.tf">storage_account</a>
+   ### storage_account 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/storage_account/main.tf">storage_account</a> defines these Azure resources:
+
+   - "azurerm_storage_account" "storage_account" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_machine/main.tf">virtual_machine</a>
+   ### virtual_machine 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_machine/main.tf">virtual_machine</a> defines these Azure resources:
+
+   - "azurerm_public_ip" "public_ip" {
+   - "azurerm_network_security_group" "nsg" {
+   - "azurerm_network_interface" "nic" {
+   - "azurerm_network_interface_security_group_association" "nsg_association" {
+   - "azurerm_linux_virtual_machine" "virtual_machine" {
+   - "azurerm_virtual_machine_extension" "azure_monitor_agent" {
+   - "azurerm_monitor_data_collection_rule" "linux" {
+   - "azurerm_monitor_data_collection_rule_association" 
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_network/main.tf">virtual_network</a>
+   ### virtual_network 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_network/main.tf">virtual_network</a> defines these Azure resources:
+
+   - "azurerm_virtual_network" "vnet" {
+   - "azurerm_subnet" "subnet" {
+   - "azurerm_monitor_diagnostic_setting" "settings" {
+   <br /><br />
    
-   1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_network_peering/main.tf">virtual_network_peering</a>
+   ### virtual_network_peering 
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/virtual_network_peering/main.tf">virtual_network_peering</a> defines these Azure resources:
+
+   - [no output.tf]
+   - "azurerm_virtual_network_peering" "peering" {
+   - "azurerm_virtual_network_peering" "peering-back" {
    <br /><br />
 
 Within each folder are several basic Terraform files (main.tf, outputs.tf, variables.tf).
