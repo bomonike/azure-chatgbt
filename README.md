@@ -20,6 +20,7 @@ The steps to make this happen.
 Commentary about the technology used is presented to explain the configurations.
 
 <a name="A.">
+
 ### A. Establish Prerequisites:
 
 1. <a href="#Install+Prerequisite+Utilities">Install Perequisite Utilities</a>
@@ -57,6 +58,7 @@ Commentary about the technology used is presented to explain the configurations.
 1. <a href="#10-configure-dns.sh">10-configure-dns.sh</a> ?
 
 <a name="C.">
+
 ### C. Use Terraform to establish Azure resources:
 
 1. <a href="#Terraform+Providers">Terraform Providers</a>
@@ -77,6 +79,7 @@ Commentary about the technology used is presented to explain the configurations.
 
 
 <a name="D.">
+
 ### D. Use Docker and Helm to establish Kubernetes cluster:
 
 1. <a href="#install-packages-for-chainlit-demo.sh">install-packages-for-chainlit-demo.sh</a> 
@@ -100,13 +103,18 @@ Commentary about the technology used is presented to explain the configurations.
 1. <a href="#Review+AKS+Resources+Deployed">Review AKS Resources Deployed</a>
 
 <a name="E.">
+
 ### E. <a href="Test">Test</a> functionality and performance:
 
 1. <a href="#Use-ChatGPT+Application">Use ChatGPT Application</a>
 
-E. <a href="#Clean+up+resources">Clean up resources</a>
+<a name="F.">
 
-F. <a href="#Roadmap">Roadmap</a>
+F. <a href="#Clean+up+resources">Clean up resources</a>
+
+<a name="G.">
+
+G. <a href="#Roadmap">Roadmap</a>
 <br /><br />
 
 
