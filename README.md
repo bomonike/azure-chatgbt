@@ -114,13 +114,13 @@ F. <a href="#Clean+up+resources">Clean up resources</a>
 
 <a name="G."></a>
 
-G. <a href="#Roadmap">Roadmap</a>
+G. <a href="#Roadmap">Roadmap</a> for more
 <br /><br />
 
 
 <hr />
 
-<a name="Install+Perequisite+Utilities"></a>
+<a name="Install+Prerequisite+Utilities"></a>
 
 ## Install Perequisite Utilities
 
@@ -3279,7 +3279,7 @@ Remove-AzResourceGroup -Name "${aksResourceGroupName}"
 
 <a name="G."></a>
 
-## G. Roadmap
+## G. Roadmap for more
 
 1. GitHub Actions ?
 1. Diagram gradual reveal in PowerPoint
