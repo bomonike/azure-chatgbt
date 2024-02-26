@@ -19,7 +19,7 @@ The steps to make this happen.
 
 Commentary about the technology used is presented to explain the configurations.
 
-<a name="A.">
+<a name="A."></a>
 
 ### A. Establish Prerequisites:
 
@@ -39,7 +39,7 @@ Commentary about the technology used is presented to explain the configurations.
    1. openai_deployments
 
 
-<a name="B.">
+<a name="B."></a>
 
 ### B. Shell Scripts:
 
@@ -57,7 +57,7 @@ Commentary about the technology used is presented to explain the configurations.
 1. <a href="#09-deploy-apps.sh">09-deploy-apps.sh</a> ?
 1. <a href="#10-configure-dns.sh">10-configure-dns.sh</a> ?
 
-<a name="C.">
+<a name="C."></a>
 
 ### C. Use Terraform to establish Azure resources:
 
@@ -78,7 +78,7 @@ Commentary about the technology used is presented to explain the configurations.
    1. <a href="#Compute">Compute</a>
 
 
-<a name="D.">
+<a name="D."></a>
 
 ### D. Use Docker and Helm to establish Kubernetes cluster:
 
@@ -102,17 +102,17 @@ Commentary about the technology used is presented to explain the configurations.
 
 1. <a href="#Review+AKS+Resources+Deployed">Review AKS Resources Deployed</a>
 
-<a name="E.">
+<a name="E."></a>
 
 ### E. <a href="Test">Test</a> functionality and performance:
 
 1. <a href="#Use-ChatGPT+Application">Use ChatGPT Application</a>
 
-<a name="F.">
+<a name="F."></a>
 
 F. <a href="#Clean+up+resources">Clean up resources</a>
 
-<a name="G.">
+<a name="G."></a>
 
 G. <a href="#Roadmap">Roadmap</a>
 <br /><br />
@@ -120,7 +120,7 @@ G. <a href="#Roadmap">Roadmap</a>
 
 <hr />
 
-<a name=#Install+Perequisite+Utilities"></a>
+<a name="Install+Perequisite+Utilities"></a>
 
 ## Install Perequisite Utilities
 
@@ -3257,7 +3257,9 @@ The ingress object defines the following annotations:
 
 <hr />
 
-## Clean up resources
+<a name="F."></a>
+
+## F. Clean up resources
 
 When you no longer need the resources you created, just delete the resource group. This will remove all the Azure resources.
 
@@ -3275,7 +3277,9 @@ Remove-AzResourceGroup -Name "${aksResourceGroupName}"
 
 <hr />
 
-## Roadmap
+<a name="G."></a>
+
+## G. Roadmap
 
 1. GitHub Actions ?
 1. Diagram gradual reveal in PowerPoint
