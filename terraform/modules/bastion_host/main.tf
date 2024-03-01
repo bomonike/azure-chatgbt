@@ -1,3 +1,5 @@
+# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/azurerm_public_ip
+# access information about an existing Public IP Address.
 resource "azurerm_public_ip" "public_ip" {
   name                = "${var.name}PublicIp"
   location            = var.location
@@ -13,6 +15,8 @@ resource "azurerm_public_ip" "public_ip" {
   }
 }
 
+# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/bastion_host
+# Manages a Bastion Host.
 resource "azurerm_bastion_host" "bastion_host" {
   name                = var.name
   location            = var.location
@@ -31,6 +35,7 @@ resource "azurerm_bastion_host" "bastion_host" {
     ]
   }
 }
+
 
 resource "azurerm_monitor_diagnostic_setting" "settings" {
   name                       = "DiagnosticsSettings"
