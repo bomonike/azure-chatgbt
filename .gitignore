@@ -38,7 +38,7 @@ Temporary Items
 # Local .terraform directories
 **/.terraform/*
 # Block files created by tf init:
-terraform/.terraform/*
+.terraform.lock.hcl
 
 # .tfstate files
 *.tfstate
