@@ -1,9 +1,16 @@
-This repo provides a hands-on step-by-step tutorial, with commentary, on how to create a "21st Century system":
+This repo provides a hands-on step-by-step cookbook, with commentary, on how to create a "21st Century type system":
 
-1. A Python-based Q&A chat client app is reached via a public IP behind a public load balancer to an NGINX Ingress Controller.
-1. The app uses Chainlit to generate its GUI.
-1. The app makes API calls to an OpenAI LLM augmented by private custom data in a ChromaDB vector store.
-1. The vector store is updated in real-time when Eventstreams to a Microsoft Fabric KQL database triggers an alert from a Reflex within Data Activator.
+TODO: Click on this diagram for a video that gradually reveals each component and feature:
+
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709349970/azure-chatgpt-240301-1920x1080_gjn6er.png"><img alt="azure-chatgpt-240301-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709349970/azure-chatgpt-240301-1920x1080_gjn6er.png"></a>
+
+![Diagram](https://res.cloudinary.com/dcajqrroq/image/upload/v1709349970/azure-chatgpt-240301-1920x1080_gjn6er.png)
+
+1. At the center are Q&A chatbots (like a "Magic 8 ball" from the 1970s) with a GUI generated using Chainlit.
+1. The apps are intelligent because they recognize English language, enabled by API calls to the OpenAI LLM ChatGPT, but augmented by private custom data (using LangChain to reference vectors in a ChromaDB vector store).
+1. Client apps are reached via a public IP behind a public load balancer to an NGINX Ingress Controller.
+
+1. The custom vector store is updated in real-time when Eventstreams to a Microsoft Fabric KQL database trigger alerts from a Reflex within Data Activator.
 1. Automated responses include the creation and announcement of a new meeting based on lookups of participant availability in Microsoft Graph, orchestrated by Power Automate. 
 1. SMS texts & RCS videos to mobile phones throughout the world are sent through a NAT Gateway to Twilio.
 
@@ -223,7 +230,7 @@ On your macOS machine, install these utilities, perhaps in one run of my <a targ
 
    PROTIP: Our team uses the <tt>bomonike</tt> GitHub organization, which is why that name is part of the URL. That folder is at the root so we have a separate account ssh and gpg for it.
 
-1. Create an internet browser window to this repo:
+1. Open an internet browser window to this URL:
 
    <pre><strong>open https://github.com/bomonike/azure-chatgbt.git</strong></pre>
 
@@ -1069,7 +1076,7 @@ Two applications are constructed by this repo:
 
    This approach also enables the most up-to-date information added from the custom store.
 
-   - <a target="_blank" href="https://learning.oreilly.com/library/view/-/9781835083468/">BOOK: Generative AI with LangChain</a> By Ben Auffarth, from Packt Publishing December 2023. 360 pages. References <a target="_blank href="https://github.com/benman1/generative_ai_with_langchain">   - github.com/benman1/generative_ai_with_langchain</a>
+   - <a target="_blank" href="https://learning.oreilly.com/library/view/-/9781835083468/">BOOK: Generative AI with LangChain</a> By Ben Auffarth, from Packt Publishing December 2023. 360 pages. References <a target="_blank" href="https://github.com/benman1/generative_ai_with_langchain">github.com/benman1/generative_ai_with_langchain</a>
    - [Introduction](https://python.langchain.com/docs/get_started/introduction.html)
    - https://www.youtube.com/@LangChain
    - <a target="_blank" href="https://www.youtube.com/watch?v=_v_fgW2SkkQ&list=PLqZXAkvF1bPNQER9mLmDbntNfSpzdDIU5">Playlist by Greg Kamradt (Data Indy)</a>
@@ -2484,8 +2491,6 @@ The `requirements.txt` file under the `scripts` folder contains the list of pack
    ```bash
 pip install -r requirements.txt --upgrade
    ```
-   Alternately, 
-zzz
 
 <a name=".env"></a>
 
@@ -2493,7 +2498,7 @@ zzz
 
 * <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/.env">VIEW: .env</a> - the fle 
 
-   ```bash
+   ```
 AZURE_OPENAI_TYPE=azure_ad
    ```
 
@@ -2502,9 +2507,9 @@ AZURE_OPENAI_TYPE=azure_ad
 
 ### app.py
 
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/app.py">VIEW: app.py</a> - Python code for the `app.py` chatbot:
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/app.py">VIEW: app.py</a> - Python code for the `app.py` chatbot:
 
-```python
+   ```python
 # Import packages
 import os
 import sys
