@@ -1,6 +1,23 @@
-"Created a Python-based chatbot calling OpenAI Chainlit REST/gPRC APIs from within Azure resources created using Bash scripts and Terraform : Entra, Key Vault, NGNIX, NAT Gateway, public &amp; private endpoints, Container Registry, Azure Kubernetes Service (AKS), Prometheus, Grafana."
+This repo provides a hands-on step-by-step tutorial, with commentary, on how to create a "21st Century system":
 
-You can put that in your resume after you go through this hands-on tutorial to show you how:
+1. A Python-based Q&A chat client app is reached via a public IP behind a public load balancer to an NGINX Ingress Controller.
+1. The app uses Chainlit to generate its GUI.
+1. The app makes API calls to an OpenAI LLM augmented by private custom data in a ChromaDB vector store.
+1. The vector store is updated in real-time when Eventstreams to a Microsoft Fabric KQL database triggers an alert from a Reflex within Data Activator.
+1. Automated responses include the creation and announcement of a new meeting based on lookups of participant availability in Microsoft Graph, orchestrated by Power Automate. 
+1. SMS texts & RCS videos to mobile phones throughout the world are sent through a NAT Gateway to Twilio.
+
+1. The app is built as a Docker container in the Azure Container Registry (ACR) to run within an Azure Kubernetes Service (AKS) cluster (for reliability).
+1. The cluster is monitored by Prometheus feeding Grafana dashboards watched by Kubernetes Monitoring Engineers.
+
+1. Azure resources are created using Bicep or Terraform IaC with Bash scripts so that security vulnerabilities can be identified before resources are created.
+1. Secrets are retrieved from Key Vault or multi-cloud Akeyless.
+1. Each resource is defined with least-privilege permissions for interlocking roles applied to a sample set of identities by Entra.
+1. Client apps are reached via a public IP behind a public load balancer to an NGINX Ingress Controller.
+1. Developers and Administrators reach servers using a public IP via a Bastion Host (jumpbox) VM created dynamically.
+<br /><br />
+
+<hr />
 
 ## Phases and Steps
 
@@ -280,7 +297,9 @@ For the best quality rendering, the <a target="_blank" href="https://docs.github
 
 ## Terraform folder
 
-See <a target="_blank" href="https://wilsonmar.github.io/terraform/">my notes about Terraform</a> files:
+See <a target="_blank" href="https://wilsonmar.github.io/terraform/">my notes about Terraform</a> files.
+
+NOTE: Terraform is not the only IaC technology. <a target="_blank" href="https://learn.microsoft.com/en-us/training/modules/build-first-bicep-template/">Microsoft's Bicep</a> <a target="_blank" href="https://www.youtube.com/watch?v=MP60ND7Upn4">templates</a> enable <a target="_blank" href="https://learn.microsoft.com/en-us/azure/templates/microsoft.servicefabric/clusters?pivots=deployment-language-bicep">Microsoft Fabric clusters</a>.
 
 The basic files in each resource created by Terraform are:
 
@@ -299,7 +318,7 @@ The basic files in each resource created by Terraform are:
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/providers.tf">VIEW: terraform/providers.tf</a>.  Its contents:
 
-   ```terraform
+   ```
    provider "azurerm" {
   features {}
 }
@@ -564,7 +583,7 @@ managedIdentityName="OpenAiManagedIdentity"
 # Azure Subscription and Tenant
 subscriptionId=$(az account show --query id --output tsv)
 subscriptionName=$(az account show --query name --output tsv)
-   #  Pay-As-You-Go
+   # Value: "Pay-As-You-Go"
 tenantId=$(az account show --query tenantId --output tsv)
 
 # Parameters
@@ -1034,7 +1053,7 @@ Two applications are constructed by this repo:
 
    ### LangChain
 
-1. LangChain adds <strong>custom vector embeddings</strong> for "Retrieval-Augmented Generation (RAG)" by augmenting LLMs such as OpenAI's GPT-x, <a target="_blank" href="https://ai.google/discover/palm2/">Google's PaLM (Pathways Language Model)</a>, <a target="_blank" href="https://claude.ai/">Anthropic's Claude</a>, <a target="_blank" href="https://learn.deeplearning.ai/courses/prompt-engineering-with-llama-2/lesson/1/introduction">VIEW</a>: <a target="_blank" href="https://llama.meta.com/">Facebook's LLaMa</a>, Hugging Face, etc. 
+1. LangChain adds <strong>custom vector embeddings</strong> for "Retrieval-Augmented Generation (RAG)" by augmenting LLMs such as OpenAI's GPT-x, <a target="_blank" href="https://ai.google/discover/palm2/">Google's PaLM (Pathways Language Model)</a>, <a target="_blank" href="https://claude.ai/">Anthropic's Claude</a>, <a target="_blank" href="https://bit.ly/4bPLwMq">VIEW</a>: <a target="_blank" href="https://llama.meta.com/">Facebook's LLaMa</a>, Hugging Face, etc. 
 
    LangChain facilitates applications such as document analysis, summarization, chatbots, and code analysis.
 
@@ -1045,6 +1064,10 @@ Two applications are constructed by this repo:
    LangChain can reference vector embeddings in memory as <tt>np.array</tt> for small amounts of data.
    
    But at scale, LangChain references data in a <a target="_blank" href="https://python.langchain.com/docs/integrations/text_embedding">vector embedding model (database)</a> such as ChromaDB.
+
+   Vectors retrieved from the custom vector embeddings are added to the question text/instructions.
+
+   This approach also enables the most up-to-date information added from the custom store.
 
    - <a target="_blank" href="https://learning.oreilly.com/library/view/-/9781835083468/">BOOK: Generative AI with LangChain</a> By Ben Auffarth, from Packt Publishing December 2023. 360 pages. References <a target="_blank href="https://github.com/benman1/generative_ai_with_langchain">   - github.com/benman1/generative_ai_with_langchain</a>
    - [Introduction](https://python.langchain.com/docs/get_started/introduction.html)
@@ -1282,10 +1305,12 @@ Within each folder are several basic Terraform files (main.tf, outputs.tf, varia
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/grafana/main.tf">grafana</a> defines these Azure resources:
 
-   - "azurerm_dashboard_grafana" "grafana" {
+   - "azurerm_dashboard_grafana" "grafana" { 
    - "azurerm_role_assignment" "grafana" {
    - "azurerm_role_assignment" "grafana_admin" {
    <br /><br />
+
+   <a target="_blank" href="https://sandervandevelde.wordpress.com/2023/12/05/microsoft-fabric-real-time-analytics-exploration-managed-grafana-integration/">render real-time ingested IoT Eventstream through a KQL database to Grafana</a>, using a <a target="_blank" href="https://azure-samples.github.io/raspberry-pi-web-simulator/">virtual Raspberry Pi IoT Hub Simulator</a> assessing Microsoft Fabric Azure Data Explorer  via a Power BI Pro license.
 
    
    <a name="key_vault"></a>
@@ -2462,19 +2487,22 @@ pip install -r requirements.txt --upgrade
    Alternately, 
 zzz
 
+<a name=".env"></a>
 
 ### .env
 
-* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/.env">
-VIEW: .env</a> 
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/.env">VIEW: .env</a> - the fle 
 
    ```bash
 AZURE_OPENAI_TYPE=azure_ad
    ```
 
 
+<a name="app.py"></a>
 
-The following table contains the code of the `app.py` chatbot:
+### app.py
+
+* <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/app.py">VIEW: app.py</a> - Python code for the `app.py` chatbot:
 
 ```python
 # Import packages
@@ -2818,13 +2846,22 @@ The `system` role or message is optional, but it's recommended to at least inclu
 Make sure to provide a value for the following environment variables when testing the `app.py` Python app locally, for example in Visual Studio Code. You can eventually define environment variables in a `.env` file in the same folder as the `app.py` file.
 
 - `AZURE_OPENAI_TYPE`: specify `azure` if you want to let the application use the API key to authenticate against OpenAI. In this case, make sure to provide the Key in the `AZURE_OPENAI_KEY` environment variable. If you want to authenticate using an Azure AD security token, you need to specify `azure_ad` as a value. In this case, don't need to provide any value in the `AZURE_OPENAI_KEY` environment variable.
+
 - `AZURE_OPENAI_BASE`: the URL of your Azure OpenAI resource. If you use the API key to authenticate against OpenAI, you can specify the regional endpoint of your Azure OpenAI Service (e.g., [https://eastus.api.cognitive.microsoft.com/](https://eastus.api.cognitive.microsoft.com/)). If you instead plan to use Azure AD security tokens for authentication, you need to deploy your Azure OpenAI Service with a subdomain and specify the resource-specific endpoint url (e.g., [https://myopenai.openai.azure.com/](https://myopenai.openai.azure.com/)).
+
 - `AZURE_OPENAI_KEY`: the key of your Azure OpenAI resource.
+
 - `AZURE_OPENAI_DEPLOYMENT`: the name of the ChatGPT deployment used by your Azure OpenAI resource, for example `gpt-35-turbo`.
+
 - `AZURE_OPENAI_MODEL`: the name of the ChatGPT model used by your Azure OpenAI resource, for example `gpt-35-turbo`.
+
 - `TITLE`: the title of the Streamlit app.
-- `TEMPERATURE`: the temperature used by the OpenAI API to generate the response.
-- `SYSTEM`: give the model instructions about how it should behave and any context it should reference when generating a response. Used to describe the assistant's personality.
+
+- `TEMPERATURE`: controls the "creativity" or "randomness" of the text generated. A high temperature of 0.9 results in more diverse output. A temperature of zero would make the model completely deterministic, always choosing the most likely token from all possible tokens in the model.
+
+- `top-p-sampling` is an alternative to temperature. A top_p set to 0.1 would cause the selection of only the top 10% of the probability mass of the next token, to allow for dynamic vocabulary selection based on context.
+
+- `SYSTEM`: gives the model instructions about how it should behave and any context it should reference when generating a response. Used to describe the assistant's personality.
 
 When deploying the application to Azure Kubernetes Service (AKS) these values are provided in a Kubernetes [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/). For more information, see the next section.
 
