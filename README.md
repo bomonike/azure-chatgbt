@@ -4,9 +4,8 @@ TODO: Click on this diagram for a video that gradually reveals each component an
 
 <a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709349970/azure-chatgpt-240301-1920x1080_gjn6er.png"><img alt="azure-chatgpt-240301-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709349970/azure-chatgpt-240301-1920x1080_gjn6er.png"></a>
 
-![Diagram](https://res.cloudinary.com/dcajqrroq/image/upload/v1709349970/azure-chatgpt-240301-1920x1080_gjn6er.png)
-
-1. At the center are Q&A chatbots (like a "Magic 8 ball" from the 1970s) with a GUI generated using Chainlit.
+1. At the center is a Q&A chatbot (like a "Magic 8 ball" from the 1970s) and a doc query app.
+1. Their GUI is generated using Chainlit that looks like OpenAI's ChatGPT web GUI.
 1. The apps are intelligent because they recognize English language, enabled by API calls to the OpenAI LLM ChatGPT, but augmented by private custom data (using LangChain to reference vectors in a ChromaDB vector store).
 1. Client apps are reached via a public IP behind a public load balancer to an NGINX Ingress Controller.
 
@@ -259,7 +258,7 @@ On your macOS machine, install these utilities, perhaps in one run of my <a targ
 At the repo's root folder are these standard files from <tt>ls -al</tt>
 
    * <a href="#.env">.env</a>
-   * .gitattributes
+   * <a href="#.gitattributes">.gitattributes</a>
    * <a href="#.gitignore">.gitignore</a>
    *	CHANGELOG.md
    *	CODE_OF_CONDUCT.md
@@ -282,6 +281,22 @@ NOTE: GitHub was designed to house text, not images. So images referenced in thi
 
 An image for the repo should be a PNG, JPG, or GIF file under 1 MB in size. 
 For the best quality rendering, the <a target="_blank" href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview">recommended size</a> is at least 640 by 320 pixels (1280 by 640 pixels for best display).
+
+
+<a name=".gitattributes"></a>
+
+### .gitattributes
+
+<a target="_blank" href="https://stackoverflow.com/questions/73086622/is-a-gitattributes-file-really-necessary-for-git">PROTIP</a>:
+Since file names ending in ".bat" are almost always edited in Windows,
+enforce their line endings have Carriage Return and Line Feed special characters:
+
+```
+*.bat text eol=crlf
+```
+
+- <a target="_blank" href="https://git-scm.com/docs/gitattributes">Technical specification on .gitattributes</a>
+
 
 <hr />
 
