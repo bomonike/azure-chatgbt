@@ -138,13 +138,59 @@ On your macOS machine, install these utilities, perhaps in one run of my <a targ
    To verify the azcli version:<br />
    <tt>az --version</tt>
 
+   ### Admin email 
+
+   ### Licenses
+
 1. An active [Azure subscription](https://docs.microsoft.com/en-us/azure/guides/developer/azure-developer-guide#understanding-accounts-subscriptions-and-billing). If you don't have one, create a [free Azure account](https://azure.microsoft.com/free/) before you begin.
 
-1. The deployment must be started by a user who has sufficient permissions to assign roles, such as a `User Access Administrator` or `Owner`.
+   Microsoft Fabric
 
-1. Test login into Azure:
+   PowerBI
+
+   Microsoft 365
+
+   ### Cognitive Responsible AI
+
+1. Use the Azure Portal GUI to sign up for a <a href="https://wilsonmar.github.io/microsoft-ai/#services-table">Cognitive Multi-Service Resource</a> and check the box acknowledging terms of Responsible AI.
+
+   <a name="Login"></a>
+
+   ### Login into the Azure cloud
+
+1. The deployment must be started by a `User Access Administrator` or `Owner` who has sufficient permissions to assign roles.
+
+1. Set the Subscription:
+
+   <pre><strong>az account set -s "${SUBSCRIPTION_ID}"
+   </strong></pre>
+
+1. Login to Azure using the default browser (such as Edge or Chrome):
 
    <pre><strong>az login</strong></pre>
+
+   Alternately,
+
+   <pre><strong>az login --use-device-code</strong></pre>
+
+   In response to:
+   <pre>To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code <strong>FC3MU3JCX</strong> to authenticate.</pre>
+
+   Highlight the code and press Command+C to copy to your invisible Clipboard.
+
+   <pre><strong>open <a target="_blank" href="https://microsoft.com/devicelogin">https://microsoft.com/devicelogin</a></strong></pre>
+
+   Paste the code and select the email of the administrator.
+
+   Provide the password for the admin account.
+
+   "Enter the code displayed in the authenticator app on your mobile phone."
+
+   Open Auth0 to select "Microsoft" to get the code to type in the browser page.
+
+   When you see "You have logged into Microsoft Azure!", close the browser tab created.
+
+   If "No subscriptions found" appears, use the Azure Portal GUI to create a Subscription.
 
 1. Assign Azure account `Microsoft.Resources/deployments/write` permissions at the subscription level.
 
@@ -155,7 +201,8 @@ On your macOS machine, install these utilities, perhaps in one run of my <a targ
 
 ## Download from GitHub
 
-1. Navigate to the folder where you want to create a repository from GitHub.com.
+1. Open a Terminal.
+1. Navigate (after creating a folder) to the folder where you want to create a repository from GitHub.com.
 
    PROTIP: Our team uses the <tt>bomonike</tt> GitHub organization, which is why that name is part of the URL. That folder is at the root so we have a separate account ssh and gpg for it.
 
@@ -197,9 +244,10 @@ At the repo's root folder are these standard files from <tt>ls -al</tt>
    *	README.md
    *	<a href="#robot.png">robot.png</a>
    <br /><br />
+   
 where all variables are declared; these might or might not have a default value.
    File <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/02-run-docker-container.sh">CONTRIBUTING.md</a> describes both the above standard files and the contents of folder:
-   * .vscode
+   * <strong>.vscode</strong> contains a 
    <br /><br />
 
 NOTE: GitHub was designed to house text, not images. So images referenced in this README are retrieved from a cloudinary.com account so image sizing can be done dynamically adjusted for different screen sizes.
@@ -226,12 +274,11 @@ For the best quality rendering, the <a target="_blank" href="https://docs.github
 *	<a href="#Terraform">terraform</a> HCL-format (defined by HashiCorp) to hold IaC (Infrastructure as Code) to automate the creation of resources
 <br /><br />
 
-
 <hr />
 
 <a name="Terraform"></a>
 
-## Terraform
+## Terraform folder
 
 See <a target="_blank" href="https://wilsonmar.github.io/terraform/">my notes about Terraform</a> files:
 
@@ -240,20 +287,27 @@ The basic files in each resource created by Terraform are:
 * <strong>main.tf</strong> specifies the resources to be provisioned the how to configure each.
 * <strong>variables.tf</strong> declares all variables (which might have a default value).
 * <a href="#terraform.tfvars"><strong>terraform.tfvars</strong></a> overrides values in variables.tf
-* <strong>outputs.tf</strong>
+* <strong>outputs.tf</strong> which defines the variables and values generated within Terraform scripts. 
+* <a href="#terraform/providers.tf">terraform.tf</a> 
 <br /><br />
 
-Additionally, under the root terraform folder are:
+<hr />
 
-* <a href=#Terraform-Modules">modules</a> (folder)
+<a name="terraform/providers.tf">providers.tf</a> 
 
-   * <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/providers.tf">terraform/modules/providers.tf</a> defines features of the providers specified in the file of the same name as the file at the root. Its contents:
+### terraform/providers.tf
+
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/providers.tf">VIEW: terraform/providers.tf</a>.  Its contents:
 
    ```terraform
    provider "azurerm" {
   features {}
 }
    ```
+
+   The file defines features of the Terraform providers specified in the file of the same name as the file at the root.
+
+   There is also a <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/modules/kubernetes/providers.tf">kubernetes/providers.tf</a>
 
    * <a target="_blank" href="#register-preview-features.sh">register-preview-features.sh</a> described in the next section.
    <br /><br />
@@ -903,7 +957,7 @@ Two applications are constructed by this repo:
 
 1. The [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) uses OpenAI's [large language models (LLMs)](https://en.wikipedia.org/wiki/Large_language_model) that became famous in 2023 for its ability to <strong>generate</strong> new content based on existing content. LLMs also enable [content summarization](https://www.zdnet.com/article/how-to-use-chatgpt-to-summarize-a-book-article-or-research-paper/), semantic search, and natural language to code translation. Users can access the service through REST APIs, Python SDK, or the web-based interface in the Azure OpenAI Studio.
 
-   The version of OpenAI used is specified in the terraform.tfvars file:
+   The version of OpenAI used is specified in the <a href="#terraform.tfvars">terraform.tfvars</a> file:
 
    <pre>openai_deployments = [
   {
@@ -959,11 +1013,15 @@ Two applications are constructed by this repo:
    
    Chainlit is an open-source Python package based on the "Streamlit" general-purpose UI library, but purpose-built for AI applications to enable conversational experiences and information retrieval. 
 
-   Chainlit can uniquely trace its [Chain of Thought](https://docs.chainlit.io/concepts/chain-of-thought), which allows users to explore the reasoning process directly within the UI. This feature enhances transparency and enables users to understand how the AI arrives at its responses or recommendations.
+   Chainlit can trace its own [Chain of Thought](https://docs.chainlit.io/concepts/chain-of-thought), which allows users to explore the reasoning process directly within the UI. This feature enhances transparency and enables users to understand how the AI arrives at its responses or recommendations.
 
-   Chainlit seamlessly integrates with <a href="#LangChain">LangChain (described below)</a>, [LlamaIndex](https://gpt-index.readthedocs.io/en/latest/), and [LangFlow](https://github.com/logspace-ai/langflow).
+   Chainlit is configured based on this (toml <a target="_blank" href="https://www.wikiwand.com/en/TOML">Tom's Obvious Minimal Language</a>)file: 
+   <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/.chainlit/config.toml">VIEW: /scripts/.chainlit/config.toml</a>
 
-   Chainlit is configured based on this (toml <a target="_blank" href="https://www.wikiwand.com/en/TOML">Tom's Obvious Minimal Language</a>)file: <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/scripts/.chainlit/config.toml">/scripts/.chainlit/config.toml</a>, 
+   * true or false values sets each feature on or off.
+   <br /><br />
+
+   Chainlit integrates with <a href="#LangChain">LangChain (described below)</a>, [LlamaIndex](https://gpt-index.readthedocs.io/en/latest/), and [LangFlow](https://github.com/logspace-ai/langflow).
 
    For more information about Chainlit, see:
    - [Documentation](https://docs.chainlit.io/overview)
@@ -976,15 +1034,15 @@ Two applications are constructed by this repo:
 
    ### LangChain
 
-1. LangChain provides <strong>custom embeddings</strong> to LLMs such as OpenAI, Anthropic, Hugging Face, etc. Adding long-term memory.
-   
+1. LangChain adds <strong>custom vector embeddings</strong> for "Retrieval-Augmented Generation (RAG)" by augmenting LLMs such as OpenAI's GPT-x, <a target="_blank" href="https://ai.google/discover/palm2/">Google's PaLM (Pathways Language Model)</a>, <a target="_blank" href="https://claude.ai/">Anthropic's Claude</a>, <a target="_blank" href="https://learn.deeplearning.ai/courses/prompt-engineering-with-llama-2/lesson/1/introduction">VIEW</a>: <a target="_blank" href="https://llama.meta.com/">Facebook's LLaMa</a>, Hugging Face, etc. 
+
    LangChain facilitates applications such as document analysis, summarization, chatbots, and code analysis.
 
    LangChain's integrations cover an extensive range of systems, tools, and services, making it a comprehensive solution for language model-based applications. LangChain integrates with the major cloud platforms and with API wrappers for various purposes like news, movie information, and weather, as well as support for Bash, web scraping, and more. 
    
    LangChain offers various functionalities for document handling, code generation, analysis, debugging, and interaction with databases and other data sources.
 
-   LangChain can reference vector embeddings in memory as np.array for small amounts of data.
+   LangChain can reference vector embeddings in memory as <tt>np.array</tt> for small amounts of data.
    
    But at scale, LangChain references data in a <a target="_blank" href="https://python.langchain.com/docs/integrations/text_embedding">vector embedding model (database)</a> such as ChromaDB.
 
@@ -996,7 +1054,9 @@ Two applications are constructed by this repo:
 
    ### ChromaDB
 
-1. ChromaDB (at <a target="_blank" href="https://docs.trychroma.com/">docs.trychroma.com</a>) is an open-source vector embeddings database that augments LLMs with custom data.
+1. ChromaDB (at <a target="_blank" href="https://docs.trychroma.com/">docs.trychroma.com</a>) is a vector embeddings database that augments LLMs with custom private data.
+
+   ChromaDB is open-source. It competes with MongoDB Atlas, startup Pinecone, etc.
 
    A [vector database](https://learn.microsoft.com/en-us/semantic-kernel/memories/vector-db) is a new type of database for the AI era because it <strong>defines relationships between words</strong> using vector arrays. 
 
@@ -1011,7 +1071,7 @@ Two applications are constructed by this repo:
    After words are attached to images, this technique is used to find visually similar images.
    This capability is used for reverse image search or content-based image retrieval.
 
-   This technique is how vector databases startup Pinecone provides private search engines and recommendation systems to suggest relevant articles or products based on user interests.
+   This technique is how vector databases provides private search engines and recommendation systems to suggest relevant articles or products based on user interests.
 
    Unusual patterns in vector embeddings can detect fraud and other anomalies.
    
@@ -1086,11 +1146,13 @@ NOTE: The scope of apps here are not voice-enabled such as <a target="_blank" hr
 
 <hr />
 
+<a name="Diagram"></a>
+
 ## Infrastructure Architecture Diagram
 
 The github repo downloaded provides a set of scripts invoking Terraform modules to deploy the following resources within Azure:
 
-<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1708631833/azure-chatbot-240221-1920x1080_kmm3pu.png"><img alt="azure-chatbot-240221-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1708631833/azure-chatbot-240221-1920x1080_kmm3pu.png"></a>
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709349970/azure-chatgpt-240301-1920x1080_gjn6er.png"><img alt="azure-chatgpt-240301-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709349970/azure-chatgpt-240301-1920x1080_gjn6er.png"></a>
 
 The diagram above is based on Paolo's <a target="_blank" href="https://github.com/paolosalvatori/aks-openai-chainlit-terraform/blob/main/visio/architecture.vsdx">vsdx</a> as referenced <a target="_blank" href="https://techcommunity.microsoft.com/t5/fasttrack-for-azure/create-an-azure-openai-langchain-chromadb-and-chainlit-chat-app/ba-p/4024070createdJan8-2024">in his blog</a>.
 
