@@ -1,4 +1,4 @@
-This repo provides a hands-on step-by-step cookbook, with commentary, on how to create a "21st Century type system":
+This repo provides a hands-on step-by-step cookbook, with commentary, on how to create a system for the "Cognitive Fifth Industrial Revolution" (5IR) enabled by AI "collaborative robots".
 
 TODO: Click on this diagram for a video that gradually reveals each component and feature:
 
@@ -10,8 +10,11 @@ TODO: Click on this diagram for a video that gradually reveals each component an
 1. Client apps are reached via a public IP behind a public load balancer to an NGINX Ingress Controller.
 
 1. The custom vector store is updated in real-time when Eventstreams to a Microsoft Fabric KQL database trigger alerts from a Reflex within Data Activator.
-1. Automated responses include the creation and announcement of a new meeting based on lookups of participant availability in Microsoft Graph, orchestrated by Power Automate. 
-1. SMS texts & RCS videos to mobile phones throughout the world are sent through a NAT Gateway to Twilio.
+1. Automated responses include the creation and calendar invite to a new meeting based on lookups of participant availability in Microsoft Graph, orchestrated by Power Automate.
+1. <a target="_blank" href="https://www.youtube.com/watch?v=JVaPK2iXVPI">VIDEO</a>: <a target="_blank" href="https://www.serverlesssql.com/fabric-link-for-dataverse-whats-in-the-box/">Microsoft Fabric linked to Dataverse in Dynamics 365 and Power Apps</a>
+1. SMS texts & RCS videos to mobile phones throughout the world are sent through a NAT Gateway to the Twilio service.
+1. The Synapse workspace is within a <a target="_blank" href="https://www.serverlesssql.com/synapse-analytics-managed-vnet-for-the-developer/">managed VNet</a> (Virtual Network) with Managed Private Endpoints to keep the Data Lake Gen2 storage away from public access.
+1. Developers are granted access based their IP address being on the IP AllowList (Whitelist).
 
 1. The app is built as a Docker container in the Azure Container Registry (ACR) to run within an Azure Kubernetes Service (AKS) cluster (for reliability).
 1. The cluster is monitored by Prometheus feeding Grafana dashboards watched by Kubernetes Monitoring Engineers.
