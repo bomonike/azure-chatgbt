@@ -4,10 +4,27 @@ TODO: Click on this diagram for a video that gradually reveals each component an
 
 <a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709424470/azure-chatgpt-arch-240302-1920x1080_mfqkrd.png"><img alt="azure-chatgpt-arch-240302-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709424470/azure-chatgpt-arch-240302-1920x1080_mfqkrd.png"></a>
 
-1. At the center is a Q&A chatbot (like a "Magic 8 ball" from the 1970s) and a doc query app.
+1. This README was written for technical people: Administrators, Platform Engineers, Developers.
+1. The steps below show how to customize our GitHub, which provides a template to quickly create your own.
+1. Bicep, Terraform, Shell scripts, and Helm in our GitHub repo automate the creation of resources in Azure.
+1. Values for variables which can be customized are defined in a <strong>terraform.tfvars</strong> file
+
+1. Before running the automation, <strong>pre-requisites</strong> include defining domain names, requesting OpenAI, storing secrets in Akeyless and Key Vault, etc.
+
+1. Terraform (and Bicep when it's available) are scanned so that security vulnerabilities can be identified before resources are created.
+1. Application code is Dockerized as containers into Azure Container Registry (ACR).
+1. Application containers are loaded by the Kubernetes <strong>kub-system</strong> running within a PodSubnet.
+1. AKS runs within an API Server subnet.
+1. The IaC creates all resources within a <strong>virtual_network</strong>, aka VNet.
+1. Developers and Administrators reach servers using a public IP via a Bastion Host (jumpbox) VM created dynamically.
+1. For better security, a VM Subnet holds a virtual machine    - `vm_enabled`: a boleean value that specifies whether deploying or not a jumpbox in the same virtual network of the AKS cluster.
+
+
+1. When the sample apps are loaded -- the sample Q&A chatbot (like a "Magic 8 ball" from the 1970s) and a doc query app.
+1. The app is used by customers, so we have a registered domain name with a public IP address. 
+1. For scalability, we have a load balancer in front of a firewall reaching an NGINX Ingress Controller cluster.
 1. Their GUI is generated using Chainlit that looks like OpenAI's ChatGPT web GUI.
 1. The apps are intelligent because they recognize English language, enabled by API calls to the OpenAI LLM ChatGPT, but augmented by private custom data (using LangChain to reference vectors in a ChromaDB vector store).
-1. Client apps are reached via a public IP behind a public load balancer to an NGINX Ingress Controller.
 
 1. The custom vector store is updated in real-time when Eventstreams to a Microsoft Fabric KQL database trigger alerts from a Reflex within Data Activator.
 1. Automated responses include the creation and calendar invite to a new meeting based on lookups of participant availability in Microsoft Graph, orchestrated by Power Automate.
@@ -16,14 +33,10 @@ TODO: Click on this diagram for a video that gradually reveals each component an
 1. The Synapse workspace is within a <a target="_blank" href="https://www.serverlesssql.com/synapse-analytics-managed-vnet-for-the-developer/">managed VNet</a> (Virtual Network) with Managed Private Endpoints to keep the Data Lake Gen2 storage away from public access.
 1. Developers are granted access based their IP address being on the IP AllowList (Whitelist).
 
-1. The app is built as a Docker container in the Azure Container Registry (ACR) to run within an Azure Kubernetes Service (AKS) cluster (for reliability).
 1. The cluster is monitored by Prometheus feeding Grafana dashboards watched by Kubernetes Monitoring Engineers.
 
-1. Azure resources are created using Bicep or Terraform IaC with Bash scripts so that security vulnerabilities can be identified before resources are created.
 1. Secrets are retrieved from Key Vault or multi-cloud Akeyless.
-1. Each resource is defined with least-privilege permissions for interlocking roles applied to a sample set of identities by Entra.
-1. Client apps are reached via a public IP behind a public load balancer to an NGINX Ingress Controller.
-1. Developers and Administrators reach servers using a public IP via a Bastion Host (jumpbox) VM created dynamically.
+1. Lastly each resource is defined with least-privilege permissions for interlocking roles. A sample set of identities by Entra. 
 <br /><br />
 
 <hr />
@@ -343,11 +356,11 @@ The basic files in each resource created by Terraform are:
 
 1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/terraform/providers.tf">VIEW: terraform/providers.tf</a>.  Its contents:
 
-   ```
+   <pre>
    provider "azurerm" {
   features {}
 }
-   ```
+   </pre>
 
    The file defines features of the Terraform providers specified in the file of the same name as the file at the root.
 
@@ -568,8 +581,6 @@ admin_group_object_ids = ["XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"]
 
    - `namespace`: specifies the namespace of the workload application that accesses the Azure OpenAI Service.
 
-   - `service_account_name`: specifies the name of the service account of the workload application that accesses the Azure OpenAI Service.
-
    - `ssh_public_key`: specifies the SSH public key used for the AKS nodes and jumpbox virtual machine. It's created by _____
 
    - `vm_enabled`: a boleean value that specifies whether deploying or not a jumpbox virtual machine in the same virtual network of the AKS cluster.
@@ -577,6 +588,31 @@ admin_group_object_ids = ["XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"]
    - `location`: specifies the region (e.g., westeurope) where deploying the Azure resources.
 
    - `admin_group_object_ids`: when deploying an AKS cluster with Azure AD and Azure RBAC integration, this array parameter contains the list of Azure AD group object IDs that will have the admin role of the cluster.
+
+
+   <a name="service_account_name"></a>
+   
+   ### service_account_name
+
+   - `service_account_name`: specifies the name of the service account of the workload application that accesses the <strong>Azure OpenAI</strong> Service. This is not the API key from <a target="_blank" href="https://platform.openai.com/api-keys">https://platform.openai.com/api-keys</a>. Use this:
+
+1. Get to the Azure OpenAI service at:
+
+   <a target="_blank" href="https://portal.azure.com/#view/Microsoft_Azure_ProjectOxford/CognitiveServicesHub/~/OpenAI">https://portal.azure.com/#view/Microsoft_Azure_ProjectOxford/CognitiveServicesHub/~/OpenAI</a>   
+
+1. Click "Create Azure OpenAI" for message:
+
+   Azure OpenAI Service is currently available to customers via an application form. The selected subscription has not been enabled for use of the service and does not have quota for any pricing tiers. Click here to request access to Azure OpenAI service.
+
+1. Click "Click here to request access to Azure OpenAI service" for the form at:
+
+   https://auth0.openai.com/u/login/identifie...
+
+1. Fill out the form.
+
+1. When you get a reply, copy the code in file <a href="#terraform.tfvars">terraform/terraform.tfvars</a>
+
+   <pre>service_account_name                     = "chainlit-sa"</strong>
 
 
    <a name="00-variables.sh"></a>
@@ -589,34 +625,34 @@ admin_group_object_ids = ["XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"]
 
    <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/tree/main/scripts/00-variables.sh">VIEW: 00-variables.sh</a>
 
-   ```bash
+   <pre>
 # Variables
 acrName="CoralAcr"
 acrResourceGrougName="CoralRG"
 location="FranceCentral"
 attachAcr=false
-
+&nbsp;
 imageName="magic8ball"
 tag="v2"
 containerName="magic8ball"
 federatedIdentityName="Magic8BallFederatedIdentity"
-
+&nbsp;
 image="$acrName.azurecr.io/$imageName:$tag"
 imagePullPolicy="IfNotPresent" # Always, Never, IfNotPresent
 managedIdentityName="OpenAiManagedIdentity"
-
+&nbsp;
 # Azure Subscription and Tenant
 subscriptionId=$(az account show --query id --output tsv)
 subscriptionName=$(az account show --query name --output tsv)
    # Value: "Pay-As-You-Go"
 tenantId=$(az account show --query tenantId --output tsv)
-
+&nbsp;
 # Parameters
 title="Magic 8 Ball"
 label="Pose your question and cross your fingers!"
 temperature="0.9"
 imageWidth="80"
-
+&nbsp;
 # OpenAI
 openAiName="CoralOpenAi"
 openAiResourceGroupName="CoralRG"
@@ -624,7 +660,7 @@ openAiType="azure_ad"
 openAiBase="https://coralopenai.openai.azure.com/"
 openAiModel="gpt-35-turbo"
 openAiDeployment="gpt-35-turbo"
-
+&nbsp;
 # Nginx Ingress Controller
 nginxNamespace="ingress-basic"
 nginxRepoName="ingress-nginx"
@@ -632,23 +668,23 @@ nginxRepoUrl="https://kubernetes.github.io/ingress-nginx"
 nginxChartName="ingress-nginx"
 nginxReleaseName="nginx-ingress"
 nginxReplicaCount=3
-
+&nbsp;
 # Certificate Manager
 cmNamespace="cert-manager"
 cmRepoName="jetstack"
 cmRepoUrl="https://charts.jetstack.io"
 cmChartName="cert-manager"
 cmReleaseName="cert-manager"
-
+&nbsp;
 # Cluster Issuer
 email="paolos@microsoft.com"
 clusterIssuerName="letsencrypt-nginx"
 clusterIssuerTemplate="cluster-issuer.yml"
-
+&nbsp;
 # AKS Cluster
 aksClusterName="CoralAks"
 aksResourceGroupName="CoralRG"
-
+&nbsp;
 # Sample Application
 namespace="magic8ball"
 serviceAccountName="magic8ball-sa"
@@ -656,7 +692,7 @@ deploymentTemplate="deployment.yml"
 serviceTemplate="service.yml"
 configMapTemplate="configMap.yml"
 secretTemplate="secret.yml"
-
+&nbsp;
 # Ingress and DNS
 ingressTemplate="ingress.yml"
 ingressName="magic8ball-ingress"
@@ -664,7 +700,7 @@ dnsZoneName="contoso.com"
 dnsZoneResourceGroupName="DnsResourceGroup"
 subdomain="magic8ball"
 host="$subdomain.$dnsZoneName"
-   ```
+   </pre>
 
 1. Customize the value of each variable: 
 
@@ -711,54 +747,6 @@ az resource list --resource-group "${aksResourceGroupName}"
    ```azurepowershell
 Get-AzResource -ResourceGroupName "${aksResourceGroupName}"
    ```
-
-
-<a name="Subnet-IP-Addresses"></a>
-
-### Subnet IP Addresses 
-
-As specified in the diagram (below):
-
-   * 10.0.0.2/8 = VNet
-   * 10.240.0.0/16 = SystemSubnet
-   * 10.241.0.0/16 = UserSubnet
-   * 10.242.0.0/16 = PodSubnet
-   * 10.243.0.0/27 = ApiServerSubnet
-   * 10.243.2.0/24 = AzureBastion
-   * 10.243.1.0/24 = VMSubnet
-   * 10.243.1.0/24 = PodSubnet
-   <br /><br  />
-
-
-
-<a name="Shell-Scripts"></a>
-
-## Shell Scripts
-
-
-
-<a name="install-nginx-via-helm-and-create-sa.sh"></a>
-
-### install-nginx-via-helm-and-create-sa.sh
-
-The [Azure Deployment Script <tt><strong>resource_deployment_script_azure_cli</strong></tt> at [https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli) is used to run the </tt><strong>install-nginx-via-helm-and-create-sa.sh</strong></tt> Bash script which:
-
-   * creates the namespace and service account for the sample application and
-   * installspackages to the AKS cluster via [Helm](https://helm.sh/). For more information from Terraform about deployment scripts, see [azurerm_resource_deployment_script_azure_cli](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli)
-
-   - [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/)
-   - [Cert-Manager](https://cert-manager.io/docs/)
-   - [Prometheus](https://prometheus.io/)
-   <br /><br />
-
-For more about Terraform:
-   - [Azure OpenAI Terraform deployment for sample chatbot](https://github.com/Azure-Samples/azure-openai-terraform-deployment-sample/)
-   - [Terraform module for deploying Azure OpenAI Service.](https://registry.terraform.io/modules/Azure/openai/azurerm/latest)
-   - <a target="_blank" href="https://www.udemy.com/course/azure-kubernetes-service-with-azure-devops-and-terraform/learn/lecture/23628292#overview">Terraform install</a>
-   <br /><br /> 
-
-
-
 
 <pre><strong>terraform plan -var-file="test.tfvars"
 </strong></pre>
@@ -1207,6 +1195,8 @@ The diagram above is based on Paolo's <a target="_blank" href="https://github.co
 
 Items in red are <a href="#Terraform-Modules">Terraform Modules (below)</a>.
 
+
+
 <a name="Terraform-Modules"></a>
 
 ### Terraform Modules
@@ -1639,6 +1629,7 @@ module "openai_private_endpoint" {
 
    TODO: Read sensitive configuration data such as passwords or SSH keys from a pre-existing Azure Key Vault resource. For more information, see [Referencing Azure Key Vault secrets in Terraform](https://thomasthornton.cloud/2022/02/26/referencing-azure-key-vault-secrets-in-terraform/).
 
+
 ### Azure OpenAI Service
 
 1. [Azure OpenAI Service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account): an [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) with a [GPT-3.5](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo) model used by the chatbot application. Azure OpenAI Service gives customers advanced language AI with OpenAI GPT-4, GPT-3, Codex, and DALL-E models with the security and enterprise promise of Azure. Azure OpenAI co-develops the APIs with OpenAI, ensuring compatibility and a smooth transition from one to the other.
@@ -1727,6 +1718,53 @@ For more on this topic:
 1. TODO: Run <a target="_blank" href="https://github.com/marketplace/actions/gitguardian-shield-action">Git Guardian</a>
 
 1. TODO: Add a step to <a target="_blank" href="https://github.com/marketplace/actions/todo-to-issue">convert TODO comments in code to GitHub Issues.
+
+<hr />
+
+
+
+<a name="Subnet-IP-Addresses"></a>
+
+### Subnet IP Addresses 
+
+As specified in the diagram (below):
+
+   * 10.0.0.2/8 = VNet
+   * 10.240.0.0/16 = SystemSubnet
+   * 10.241.0.0/16 = UserSubnet
+   * 10.242.0.0/16 = PodSubnet
+   * 10.243.0.0/27 = ApiServerSubnet
+   * 10.243.2.0/24 = AzureBastion
+   * 10.243.1.0/24 = VMSubnet
+   * 10.243.1.0/24 = PodSubnet
+   <br /><br  />
+
+
+
+<a name="Shell-Scripts"></a>
+
+## Shell Scripts
+
+
+<a name="install-nginx-via-helm-and-create-sa.sh"></a>
+
+## install-nginx-via-helm-and-create-sa.sh
+
+The [Azure Deployment Script <tt><strong>resource_deployment_script_azure_cli</strong></tt> at [https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli) is used to run the </tt><strong>install-nginx-via-helm-and-create-sa.sh</strong></tt> Bash script which:
+
+   * creates the namespace and service account for the sample application and
+   * installspackages to the AKS cluster via [Helm](https://helm.sh/). For more information from Terraform about deployment scripts, see [azurerm_resource_deployment_script_azure_cli](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_deployment_script_azure_cli)
+
+   - [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/)
+   - [Cert-Manager](https://cert-manager.io/docs/)
+   - [Prometheus](https://prometheus.io/)
+   <br /><br />
+
+For more about Terraform:
+   - [Azure OpenAI Terraform deployment for sample chatbot](https://github.com/Azure-Samples/azure-openai-terraform-deployment-sample/)
+   - [Terraform module for deploying Azure OpenAI Service.](https://registry.terraform.io/modules/Azure/openai/azurerm/latest)
+   - <a target="_blank" href="https://www.udemy.com/course/azure-kubernetes-service-with-azure-devops-and-terraform/learn/lecture/23628292#overview">Terraform install</a>
+   <br /><br /> 
 
 
 <hr />
