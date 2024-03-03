@@ -2,7 +2,7 @@ This repo provides a hands-on step-by-step cookbook, with commentary, on how to 
 
 TODO: Click on this diagram for a video that gradually reveals each component and feature:
 
-<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709349970/azure-chatgpt-240301-1920x1080_gjn6er.png"><img alt="azure-chatgpt-240301-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709349970/azure-chatgpt-240301-1920x1080_gjn6er.png"></a>
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709424470/azure-chatgpt-arch-240302-1920x1080_mfqkrd.png"><img alt="azure-chatgpt-arch-240302-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709424470/azure-chatgpt-arch-240302-1920x1080_mfqkrd.png"></a>
 
 1. At the center is a Q&A chatbot (like a "Magic 8 ball" from the 1970s) and a doc query app.
 1. Their GUI is generated using Chainlit that looks like OpenAI's ChatGPT web GUI.
@@ -728,6 +728,7 @@ As specified in the diagram (below):
    * 10.243.1.0/24 = VMSubnet
    * 10.243.1.0/24 = PodSubnet
    <br /><br  />
+
 
 
 <a name="Shell-Scripts"></a>
@@ -1688,9 +1689,14 @@ module "openai_private_endpoint" {
 <a target="_blank" href="https://www.youtube.com/watch?v=-hVG9z0fCac&list=PLArH6NjfKsUhvGHrpag7SuPumMzQRhUKY&pp=iAQB">VIDEO</a>:
 TODO: In the <tt>.github/workflow</tt> folder are GitHub Actions yaml files that define how to work.
 
-   They are automatically invoked when a <tt>git push</tt> is performed.
+1. <a target="_blank" href="https://github.com/bomonike/azure-chatgbt/blob/main/.github/workflows/generator-generic-ossf-slsa3-publish.yml">VIEW: file <strong>generator-generic-ossf-slsa3-publish.yml</strong>
 
-   For more on this topic:
+   The workflow (at <a target="_blank" href="https://github.com/slsa-framework/slsa-github-generator/">github.com/slsa-framework/slsa-github-generator
+</a>) generates a supply-chain provenance file of the project to meet <a target="_blank" href="https://wilsonmar.github.io/slsa/">SLSA</a> for "level 3" as defined in <a target="_blank" href="https://slsa.dev/spec/v0.1/requirements">v0.1/requirements</a> from <a target="_blank" href="https://slsa.dev">slsa.dev</a>, an initiative of the <a target="_blank" href="https://www.openssf.org/">OpenSSF</a>.
+   
+Workflows are automatically invoked when a <tt>git push</tt> is performed.
+
+For more on this topic:
    * https://wilsonmar.github.io/github-actions
    * https://github.com/actions
    * https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/
@@ -1702,6 +1708,7 @@ TODO: In the <tt>.github/workflow</tt> folder are GitHub Actions yaml files that
    The ability to check for vulnerabilities before they are even created is a major benefit for using IaC (Terraform, Azure Resource Manager, Bicep) code.
 
    WARNING: Scanning by a third-party in the cloud means your code is read and possibly retained by those third-parties, a potential security risk.
+
 
 1. TODO: Add a step in the GitHub workflow to create a SBOM (Software Bill of Materials) by iteratively (exhaustively) following the chain of packages referenced in each program. This would add many more to the list of 138 in the file. This enables raising an alert if any package:
    
