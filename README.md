@@ -1,34 +1,58 @@
 This repo provides a hands-on step-by-step cookbook, with commentary, on how to create a system for the "Cognitive Fifth Industrial Revolution" (5IR) enabled by AI "collaborative robots".
 
-TODO: Click on this diagram for a video that gradually reveals each component and feature:
+Our motivation is to avoid this:
 
-<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709424470/azure-chatgpt-arch-240302-1920x1080_mfqkrd.png"><img alt="azure-chatgpt-arch-240302-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709424470/azure-chatgpt-arch-240302-1920x1080_mfqkrd.png"></a>
+> "It took us 4 days to come up with a ChatGPT app, then it took 4 months to take it public to paying customers."
 
-1. This README was written for technical people: Administrators, Platform Engineers, Developers.
-1. The steps below show how to customize our GitHub, which provides a template to quickly create your own.
-1. Bicep, Terraform, Shell scripts, and Helm in our GitHub repo automate the creation of resources in Azure.
-1. Values for variables which can be customized are defined in a <strong>terraform.tfvars</strong> file
+TODO: Click on this diagram for a video that gradually reveals each component and feature.
 
-1. Before running the automation, <strong>pre-requisites</strong> include defining domain names, requesting OpenAI, storing secrets in Akeyless and Key Vault, etc.
+<a target="_blank" href="hhttps://res.cloudinary.com/dcajqrroq/image/upload/v1709457812/azure-chatgpt-arch-240302-1920x1080_h9rge9.png"><img alt="azure-chatgpt-arch-240303-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709457812/azure-chatgpt-arch-240302-1920x1080_h9rge9.png"></a>
 
-1. Terraform (and Bicep when it's available) are scanned so that security vulnerabilities can be identified before resources are created.
-1. Application code is Dockerized as containers into Azure Container Registry (ACR).
-1. Application containers are loaded by the Kubernetes <strong>kub-system</strong> running within a PodSubnet.
-1. AKS runs within an API Server subnet.
+1. This GitHub repo README shows all the steps and code to customize our template for
+1. technical people: Administrators, Platform Engineers, and Developers to quickly create a scalable and secure AI system for use by non-technical <strong>customers</strong>.
+
+1. Before running the automation, at GoDaddy or another name registrar, pay for <strong>Domain names</strong> to be used.
+1. Domain names and IP Addresses are pasted in the <strong>terraform.tfvars</strong> file, which Terraform modules reference to obtain customized values during deployment.
+1. Use the Azure Portal GUI to obtain Azure accounts and the Subscription to use.
+
+1. The Subscription ID should be saved in Azure Key Vault or Akeyless cloud so that it and other secrets never end up in GitHub.
+1. The Subscription ID is provided to login to run batch Bicep, Terraform, Helm, and Shell scripts. The (roles_build) script defines admin users and their permissions.
+
+1. Additional prerequisites are to manually obtain a license for Microsoft Fabric, a service name for Azure OpenAI, API key secret handling in Akeyless.
+
+1. There is not yet automation to agree to Microsoft's Responsible AI for Cognitive AI utilities.
+
+1. When Terraform runs, it sets up the <strong>virtual network</strong> and all resources that run within it, including Private DNS Zones, Public IP addresses for the bastion_host used to enter the network.
+
+
+Kubernetes.
+
+1. The <strong>variables</strong> file contains specifications for Helm and Ansible to build within Kubernetes.
+
+1. Setup Bicep and Terraform Infrastructure code to be <strong>scanned<strong> so that security vulnerabilities can be identified before resources are created.
+1. Setup application code to be <strong>Dockerize</strong> as containers into the Azure Container Registry (ACR).
+1. Application containers are loaded by the Kubernetes <strong>kub-system</strong>
+1. AKS (Azure Kubernetes Service) provides management functionality to Kubernetes.
+1. AKS manages two node pools: a System Agent Pool and a User Agent Pool, each in a separate Subnet.
+1. An API Server subnet runs the PodSubnet that house apps.
+
 1. The IaC creates all resources within a <strong>virtual_network</strong>, aka VNet.
 1. Developers and Administrators reach servers using a public IP via a Bastion Host (jumpbox) VM created dynamically.
-1. For better security, a VM Subnet holds a virtual machine    - `vm_enabled`: a boleean value that specifies whether deploying or not a jumpbox in the same virtual network of the AKS cluster.
-
+1. For better security, a VM Subnet, if enabled, holds a virtual machine for a jumpbox in the same virtual network of the AKS cluster.
 
 1. When the sample apps are loaded -- the sample Q&A chatbot (like a "Magic 8 ball" from the 1970s) and a doc query app.
-1. The app is used by customers, so we have a registered domain name with a public IP address. 
+
+   NOTE: <a target="_blank" href="https://learn.microsoft.com/en-us/training/modules/introduction-power-virtual-agents/3-build-basic-chatbot">Microsoft Power Virtual Agents</a> can create "bots". But its logic is defined programmatically. ChatGPT bots interact using Natural Language based on new LLM containing a large corpus of vectored words.
+
+1. The app is used by customers, so we have a registered <strong>domain name</strong> with a public IP address. 
 1. For scalability, we have a load balancer in front of a firewall reaching an NGINX Ingress Controller cluster.
 1. Their GUI is generated using Chainlit that looks like OpenAI's ChatGPT web GUI.
 1. The apps are intelligent because they recognize English language, enabled by API calls to the OpenAI LLM ChatGPT, but augmented by private custom data (using LangChain to reference vectors in a ChromaDB vector store).
 
 1. The custom vector store is updated in real-time when Eventstreams to a Microsoft Fabric KQL database trigger alerts from a Reflex within Data Activator.
 1. Automated responses include the creation and calendar invite to a new meeting based on lookups of participant availability in Microsoft Graph, orchestrated by Power Automate.
-1. <a target="_blank" href="https://www.youtube.com/watch?v=JVaPK2iXVPI">VIDEO</a>: <a target="_blank" href="https://www.serverlesssql.com/fabric-link-for-dataverse-whats-in-the-box/">Microsoft Fabric linked to Dataverse in Dynamics 365 and Power Apps</a>
+1. <a target="_blank" href="https://www.youtube.com/watch?v=JVaPK2iXVPI">VIDEO</a>: <a target="_blank" href="https://www.serverlesssql.com/fabric-link-for-dataverse-whats-in-the-box/">Microsoft Fabric linked to Dataverse in Dynamics 365 and Power Apps</a> <a target="_blank" href="https://adatis.co.uk/dataverse-integration-with-microsoft-fabric/">integration with Dataverse</a> "Common Data Model" in Power apps.
+
 1. SMS texts & RCS videos to mobile phones throughout the world are sent through a NAT Gateway to the Twilio service.
 1. The Synapse workspace is within a <a target="_blank" href="https://www.serverlesssql.com/synapse-analytics-managed-vnet-for-the-developer/">managed VNet</a> (Virtual Network) with Managed Private Endpoints to keep the Data Lake Gen2 storage away from public access.
 1. Developers are granted access based their IP address being on the IP AllowList (Whitelist).
@@ -3914,6 +3938,7 @@ By Rob Chapman and Peter Holmes
 from Packt Publishing January 2024
 356 pages
 
+https://sandervandevelde.wordpress.com/2023/12/05/microsoft-fabric-real-time-analytics-exploration-managed-grafana-integration/
 
 
 END
