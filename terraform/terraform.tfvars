@@ -11,9 +11,9 @@ admin_group_object_ids                   = ["4e4d0501-e693-4f3e-965b-5bec6c410c0
 grafana_admin_user_object_id             = "0c5267b2-01f3-4a59-970e-0d9218d5412e"
 web_app_routing_enabled                  = true
 namespace                                = "chainlit"
-service_account_name                     = "chainlit-sa"
 #deployment_script_primary_script_uri     = "https://paolosalvatori.blob.core.windows.net/scripts/install-packages-for-chainlit-demo.sh"
 vnet_integration_enabled                 = true
+service_account_name                     = "chainlit-sa"
 openai_deployments      = [
   {
     name = "gpt-35-turbo-16k"

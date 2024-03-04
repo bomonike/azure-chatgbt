@@ -4,9 +4,11 @@ Our motivation is to avoid this:
 
 > "It took us 4 days to come up with a ChatGPT app, then it took 4 months to take it public to paying customers."
 
+The complexity of the diagram below is why it takes so long. And it doesn't include everything.
+
 TODO: Click on this diagram for a video that gradually reveals each component and feature.
 
-<a target="_blank" href="hhttps://res.cloudinary.com/dcajqrroq/image/upload/v1709457812/azure-chatgpt-arch-240302-1920x1080_h9rge9.png"><img alt="azure-chatgpt-arch-240303-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709457812/azure-chatgpt-arch-240302-1920x1080_h9rge9.png"></a>
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709526045/azure-chatgpt-arch-240303-1920x1080_fn2lv5.png"><img alt="azure-chatgpt-arch-240303-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709526045/azure-chatgpt-arch-240303-1920x1080_fn2lv5.png"></a>
 
 1. This GitHub repo README shows all the steps and code to customize our template for
 1. technical people: Administrators, Platform Engineers, and Developers to quickly create a scalable and secure AI system for use by non-technical <strong>customers</strong>.
@@ -14,20 +16,17 @@ TODO: Click on this diagram for a video that gradually reveals each component an
 1. Before running the automation, at GoDaddy or another name registrar, pay for <strong>Domain names</strong> to be used.
 1. Domain names and IP Addresses are pasted in the <strong>terraform.tfvars</strong> file, which Terraform modules reference to obtain customized values during deployment.
 1. Use the Azure Portal GUI to obtain Azure accounts and the Subscription to use.
+1. So that this and other secrets never end up being exposed in GitHub, save them in the <strong>Akeyless</strong> cloud because your instance of <strong>Azure Key Vault</strong> can be easily deleted.
+1. The same goes for Storage Accounts. 
 
-1. The Subscription ID should be saved in Azure Key Vault or Akeyless cloud so that it and other secrets never end up in GitHub.
 1. The Subscription ID is provided to login to run batch Bicep, Terraform, Helm, and Shell scripts. The (roles_build) script defines admin users and their permissions.
 
-1. Additional prerequisites are to manually obtain a license for Microsoft Fabric, a service name for Azure OpenAI, API key secret handling in Akeyless.
-
-1. There is not yet automation to agree to Microsoft's Responsible AI for Cognitive AI utilities.
+1. There is not yet automation to agree to Microsoft's Responsible AI for Cognitive AI utilities, so that has to be done using the Portal GUI.
+1. Additional prerequisites are to manually obtain a license for Microsoft Fabric, a service name for Azure OpenAI, API keys, etc.
 
 1. When Terraform runs, it sets up the <strong>virtual network</strong> and all resources that run within it, including Private DNS Zones, Public IP addresses for the bastion_host used to enter the network.
 
-
-Kubernetes.
-
-1. The <strong>variables</strong> file contains specifications for Helm and Ansible to build within Kubernetes.
+1. File <strong>00-variables.sh</strong> contains custom values for Helm and Ansible to build within Kubernetes.
 
 1. Setup Bicep and Terraform Infrastructure code to be <strong>scanned<strong> so that security vulnerabilities can be identified before resources are created.
 1. Setup application code to be <strong>Dockerize</strong> as containers into the Azure Container Registry (ACR).
@@ -636,7 +635,7 @@ admin_group_object_ids = ["XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"]
 
 1. When you get a reply, copy the code in file <a href="#terraform.tfvars">terraform/terraform.tfvars</a>
 
-   <pre>service_account_name                     = "chainlit-sa"</strong>
+   <pre>service_account_name                     = "chainlit-sa"</pre>
 
 
    <a name="00-variables.sh"></a>
