@@ -6,44 +6,106 @@ Our motivation is to avoid this:
 
 The complexity of the diagram below is why it takes so long. And it doesn't include everything.
 
-TODO: Click on this diagram for a video that gradually reveals each component and feature.
+Before we configure and run the deployment in a sequential way, let's first use a conceptually logical tour of the architectual components.
 
-<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709526045/azure-chatgpt-arch-240303-1920x1080_fn2lv5.png"><img alt="azure-chatgpt-arch-240303-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709526045/azure-chatgpt-arch-240303-1920x1080_fn2lv5.png"></a>
+## Architectural Tour
+
+<!-- TODO: Click on this diagram for a video that gradually reveals each component and feature.
+-->
+
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709870916/yatyjfpr0wkzfuximlt4.png"><img alt="azure-chatgpt-arch-240307-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709870916/yatyjfpr0wkzfuximlt4.png"></a>
 
 1. This GitHub repo README shows all the steps and code to customize our template for
-1. technical people: Administrators, Platform Engineers, and Developers to quickly create a scalable and secure AI system for use by non-technical <strong>customers</strong>.
+1. technical creatives: Platform Engineers and Developers to build <strong>web apps</strong> with 
+1.a GUI generated using <strong>Chainlit</strong>, an adaptation of the Streamlit library.
+1. The apps make <strong>API</strong> requests from one of the <strong>OpenAI LLMs</strong> offered through <strong>Azure</strong>.
+1. The "etc" means that LangChain can alternately reference other LLMs as well. That's because
+1. <strong>LangChain</strong> is an open-sourced component used to fine-tune the LLM using RAG (Retrieval Augmented Generation).
+1. It works by storing custom tokens and weights in a <strong>ChromaDB</strong> vector store, then 
+1. sending it ahead of <strong>prompts</strong> entered by app users.
 
-1. Before running the automation, at GoDaddy or another name registrar, pay for <strong>Domain names</strong> to be used.
-1. Domain names and IP Addresses are pasted in the <strong>terraform.tfvars</strong> file, which Terraform modules reference to obtain customized values during deployment.
-1. Use the Azure Portal GUI to obtain Azure accounts and the Subscription to use.
-1. So that this and other secrets never end up being exposed in GitHub, save them in the <strong>Akeyless</strong> cloud because your instance of <strong>Azure Key Vault</strong> can be easily deleted.
-1. The same goes for Storage Accounts. 
+   ### DevSecOps
 
-1. The Subscription ID is provided to login to run batch Bicep, Terraform, Helm, and Shell scripts. The (roles_build) script defines admin users and their permissions.
+1. Modern developers have their code in <strong>GitHub.com</strong> so their code can be automatically <strong>scanned</strong> and reviewed by the team before automated builds by "Continuous Delivery" workflow tools.
 
-1. There is not yet automation to agree to Microsoft's Responsible AI for Cognitive AI utilities, so that has to be done using the Portal GUI.
-1. Additional prerequisites are to manually obtain "capacity units" for Microsoft Fabric, a service name for Azure OpenAI, API keys, etc.
+   App users can be just Developers making calls to LLM APIs locally from a developer's laptop.
+
+   However, when it's desired to have <strong>customers</strong> access the app from a <strong>public IP address</strong> -- paying customers who can sue the company or make nasty comments to others -- we now need to define secure and scalable ingress and egress of data around the apps.
+
+1. For that, we need a <strong>domain name</strong> unique to the world, and various social media accounts based on the same branding.
+1. Engineers and developers would need a <strong>sub-domain name</strong> to access the system.
+1. <strong>Operations Administrators</strong> who monitor the system, take backups, and onboard users should also use a separate <strong>sub-domain</strong> to provide segmentation to reduce the "blast radius" in case an account is compromised.
+
+1. To define permissions securely, an <strong>administrator email</strong> used solely for Azure setup creates a <strong>subscription ID</strong> -- for each department or other grouping to administer billing and security.
+1. TODO: Individual work accounts can then be set up using least-privilege Attribute-based and RBAC (Role-Based Access Control) by running a script named <strong>"role_build"</strong>. This automation saves hours of onboarding time for administrators while improving security and accuracy.
+
+   ### Provision Network
+
+1. Creation of Azure resources is automated using IaC (Infrastructure as Code) <strong>Terraform</strong> CLI commands. ALternately, Opentofu or Bicep commands can be used.
+1. Values for variables controlling infrastructure provisioning are manually entered in file <strong>terraform.tfvars</strong>.
+1. A <strong>virtual_network</strong> (aka Vnet) is created to house several subnets.
+
+   BTW: Red lettering in this diagram indicates the name of a folder already defined to provide Terraform module code that provisions the component.
+   Blue lettering indicates the name of a folder that is under construction.
+
+1. The network_security_group, <a href="#route_table">route_table</a>, virtual_network_peering are established.
+1. <strong>private_dns_zones</strong> 
+1. <strong>nat_gateway</strong> to the public internet.
+1. The AzureBastion subnet provides an entryway for Developers into the virtual network.
+
+   ## Private Endpoints VM
+
+1. The VMSubnet holds a virtual_machine with a <strong>Jumpbox</strong> and 
+1. <strong>Private endpoints</strong> protect communications through private IPs with services outside the virtual network. The endpoints are managed by the <a target="_blank" href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview">Private Link service</a>.
+1. QUESTION: Private endpoints connect to the <strong>storage_account</strong>,
+1. <strong>log_analytics</strong>,
+1. Microsoft Fabric OneLake Storage.
+
+1. So that secrets never end up being exposed in GitHub, we save them in a centrally administered <strong>Akeyless</strong> multi-cloud vault because 
+1. instances of <strong>Azure Key Vault</strong> can be accidentally deleted during development work.
+
+   ### Portal GUI manually
+
+1. When establishing AI (formally called Cognitive) services such as text-to-speech and speech-to-text, the Azure Portal GUI must be used to acknowledge Microsoft's Responsible AI agreement checkbox before automation is allowed.
+
+   NOTE: Additional manual prerequisites are also needed to manually obtain "capacity units" for Microsoft Fabric, a service name for Azure OpenAI, API keys, etc.
+
+   ### Docker & Kuberenetes
+
+1. For easier troubleshooting and reliability, apps are  <strong>Dockerized</strong> into run-time <strong>Docker containers</strong>
+1. stored in the ACR (Azure Container Registry) service.
+1. Dockerization enables containers to be orchestrated by Kubernetes.
+
+1. Setup application code to be <strong>Dockerize</strong> as containers into the Azure Container Registry (ACR).
+1. Application containers are loaded by the Kubernetes <strong>kube-system</strong>
+1. AKS (Azure Kubernetes Service) provides management functionality to Kubernetes.
+1. The <strong>node pool</strong> consist of a System Agent Pool and a User Agent Pool, each in a separate Subnet.
+1. The <strong>API Server</strong> subnet runs the <strong>PodSubnet</strong> that house apps.
+
+   
+1. File "00-variables.sh" is updated by the teams to customize values used to control Kubernetes deployment script behavior.
+1. Since a key feature of the app is to have responses based on <strong>updates</strong> of custom vectors in that custom ChromaDB, 
+
+1. Power Automate can reference a <strong>Dataverse</strong> database itself updated as a mirror by 
+1. Logic apps triggered to perform updates.
+
+   <a href="#Cloud">Later in this README</a>, we'll also show how to surround the app within a scalable and secure cloud infrastructure for use by non-technical <strong>customers</strong>.
+
+   four categories of potential harm (hate, sexual, violence, and self-harm). 
+   <a target="_blank" href="https://learn.microsoft.com/en-us/training/modules/responsible-generative-ai/5-mitigate-harms">LEARN</a>: 
+
 
 1. When Terraform runs, it sets up the <strong>virtual network</strong> and all resources that run within it, including Private DNS Zones, Public IP addresses for the bastion_host used to enter the network.
 
 1. File <strong>00-variables.sh</strong> contains custom values for Helm and Ansible to build within Kubernetes.
 
 1. Setup Bicep and Terraform Infrastructure code to be <strong>scanned<strong> so that security vulnerabilities can be identified before resources are created.
-1. Setup application code to be <strong>Dockerize</strong> as containers into the Azure Container Registry (ACR).
-1. Application containers are loaded by the Kubernetes <strong>kub-system</strong>
-1. AKS (Azure Kubernetes Service) provides management functionality to Kubernetes.
-1. AKS manages two node pools: a System Agent Pool and a User Agent Pool, each in a separate Subnet.
-1. An API Server subnet runs the PodSubnet that house apps.
-
-1. The IaC creates all resources within a <strong>virtual_network</strong>, aka VNet.
-1. Developers and Administrators reach servers using a public IP via a Bastion Host (jumpbox) VM created dynamically.
-1. For better security, a VM Subnet, if enabled, holds a virtual machine for a jumpbox in the same virtual network of the AKS cluster.
 
 1. When the sample apps are loaded -- the sample Q&A chatbot (like a "Magic 8 ball" from the 1970s) and a doc query app.
 
    NOTE: <a target="_blank" href="https://learn.microsoft.com/en-us/training/modules/introduction-power-virtual-agents/3-build-basic-chatbot">Microsoft Power Virtual Agents</a> can create "bots". But its logic is defined programmatically. ChatGPT bots interact using Natural Language based on new LLM containing a large corpus of vectored words.
 
-1. The app is used by customers, so we have a registered <strong>domain name</strong> with a public IP address. 
+1. If the app is used by customers, we need to provide them a registered <strong>domain name</strong> that resolves to a public IP address. 
 1. For scalability, we have a load balancer in front of a firewall reaching an NGINX Ingress Controller cluster.
 1. Their GUI is generated using Chainlit that looks like OpenAI's ChatGPT web GUI.
 1. The apps are intelligent because they recognize English language, enabled by API calls to the OpenAI LLM ChatGPT, but augmented by private custom data (using LangChain to reference vectors in a ChromaDB vector store).
@@ -60,6 +122,21 @@ TODO: Click on this diagram for a video that gradually reveals each component an
 
 1. Some Terraform (main.tf) files define least-privilege RBAC (Role-Based Access Controls) to reduce the "blast radius" in case credentials are stolen due to phishing, etc. 
 <br /><br />
+
+## Enhance Your Resume
+
+Implementing several parts of this repo provides you real achievements to brag about on your resume:
+
+<a target="_blank" href="https://res.cloudinary.com/dcajqrroq/image/upload/v1709870916/yatyjfpr0wkzfuximlt4.png"><img alt="azure-chatgpt-arch-240307-1920x1080.png" src="https://res.cloudinary.com/dcajqrroq/image/upload/v1709870916/yatyjfpr0wkzfuximlt4.png"></a>
+
+A. Saved hours of onboarding time for every employee and improved security and accuracy by automating least-privilege custom RBAC rule assignments into Azure Entra.<br />
+B. Overcome resistance to GenAI ChatGPT use by adding to the LLM real-time updates using LangChain referencing custom RAG ChromaDB vector database.<br /> 
+C. Reduced troubleshooting time by adding ACID transactions to SQL databases on Azure.<br />
+D. Improved responsiveness by introducing Data Activator to issue alerts based on custom triggers.<br />
+E. Improved cycle time by completely automating meeting setup using interactions with Microsoft Graph.<br />
+F. Improved flexibility and training by enabling PowerBI to analyze the Prometheus time series database used for Kubernetes automating scaling and troubleshooting.<br />
+G. Improved resolution time by enabling apps to send SMS to phones all over the world (via Twillo APIs).<br />
+
 
 <hr />
 
@@ -3943,6 +4020,9 @@ from Packt Publishing January 2024
 356 pages
 
 https://sandervandevelde.wordpress.com/2023/12/05/microsoft-fabric-real-time-analytics-exploration-managed-grafana-integration/
+
+https://www.youtube.com/watch?v=mE7IDf2SmJg
+Stanford CS25: V3 I Retrieval Augmented Language Models
 
 
 END
